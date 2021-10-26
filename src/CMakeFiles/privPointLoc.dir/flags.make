@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++-7
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/adamc/Documents/CSCI716/privPointLoc/deps/include -I/home/adamc/Documents/CSCI716/privPointLoc/src -I/home/adamc/Documents/CSCI716/privPointLoc/include
+CXX_INCLUDES = -I/home/adamc/Documents/privPointLoc/deps/include -I/home/adamc/Documents/privPointLoc/src -I/home/adamc/Documents/privPointLoc/include
 
 CXX_FLAGS = -fopenmp -std=gnu++1z
 

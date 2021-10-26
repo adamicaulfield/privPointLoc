@@ -65,10 +65,10 @@ RM = /usr/local/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/adamc/Documents/CSCI716/privPointLoc
+CMAKE_SOURCE_DIR = /home/adamc/Documents/privPointLoc
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/adamc/Documents/CSCI716/privPointLoc
+CMAKE_BINARY_DIR = /home/adamc/Documents/privPointLoc
 
 # Include any dependencies generated for this target.
 include src/CMakeFiles/privPointLoc.dir/depend.make
@@ -81,68 +81,68 @@ include src/CMakeFiles/privPointLoc.dir/flags.make
 
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: src/privPointLoc.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/CSCI716/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o -c /home/adamc/Documents/CSCI716/privPointLoc/src/privPointLoc.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o -c /home/adamc/Documents/privPointLoc/src/privPointLoc.cpp
 
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/privPointLoc.cpp.i"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/CSCI716/privPointLoc/src/privPointLoc.cpp > CMakeFiles/privPointLoc.dir/privPointLoc.cpp.i
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/privPointLoc.cpp > CMakeFiles/privPointLoc.dir/privPointLoc.cpp.i
 
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/privPointLoc.cpp.s"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/CSCI716/privPointLoc/src/privPointLoc.cpp -o CMakeFiles/privPointLoc.dir/privPointLoc.cpp.s
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/privPointLoc.cpp -o CMakeFiles/privPointLoc.dir/privPointLoc.cpp.s
 
 src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
 src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.o: src/Encryptor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/CSCI716/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.o"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/Encryptor.cpp.o -c /home/adamc/Documents/CSCI716/privPointLoc/src/Encryptor.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.o"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/Encryptor.cpp.o -c /home/adamc/Documents/privPointLoc/src/Encryptor.cpp
 
 src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/Encryptor.cpp.i"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/CSCI716/privPointLoc/src/Encryptor.cpp > CMakeFiles/privPointLoc.dir/Encryptor.cpp.i
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/Encryptor.cpp > CMakeFiles/privPointLoc.dir/Encryptor.cpp.i
 
 src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/Encryptor.cpp.s"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/CSCI716/privPointLoc/src/Encryptor.cpp -o CMakeFiles/privPointLoc.dir/Encryptor.cpp.s
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/Encryptor.cpp -o CMakeFiles/privPointLoc.dir/Encryptor.cpp.s
 
 src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
 src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.o: src/helibExamples.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/CSCI716/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.o"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/helibExamples.cpp.o -c /home/adamc/Documents/CSCI716/privPointLoc/src/helibExamples.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.o"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/helibExamples.cpp.o -c /home/adamc/Documents/privPointLoc/src/helibExamples.cpp
 
 src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/helibExamples.cpp.i"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/CSCI716/privPointLoc/src/helibExamples.cpp > CMakeFiles/privPointLoc.dir/helibExamples.cpp.i
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/helibExamples.cpp > CMakeFiles/privPointLoc.dir/helibExamples.cpp.i
 
 src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/helibExamples.cpp.s"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/CSCI716/privPointLoc/src/helibExamples.cpp -o CMakeFiles/privPointLoc.dir/helibExamples.cpp.s
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/helibExamples.cpp -o CMakeFiles/privPointLoc.dir/helibExamples.cpp.s
 
 src/CMakeFiles/privPointLoc.dir/util.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
 src/CMakeFiles/privPointLoc.dir/util.cpp.o: src/util.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/CSCI716/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/privPointLoc.dir/util.cpp.o"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/util.cpp.o -c /home/adamc/Documents/CSCI716/privPointLoc/src/util.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/privPointLoc.dir/util.cpp.o"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/util.cpp.o -c /home/adamc/Documents/privPointLoc/src/util.cpp
 
 src/CMakeFiles/privPointLoc.dir/util.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/util.cpp.i"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/CSCI716/privPointLoc/src/util.cpp > CMakeFiles/privPointLoc.dir/util.cpp.i
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/util.cpp > CMakeFiles/privPointLoc.dir/util.cpp.i
 
 src/CMakeFiles/privPointLoc.dir/util.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/util.cpp.s"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/CSCI716/privPointLoc/src/util.cpp -o CMakeFiles/privPointLoc.dir/util.cpp.s
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/util.cpp -o CMakeFiles/privPointLoc.dir/util.cpp.s
 
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o: src/FileSystem.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/CSCI716/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/FileSystem.cpp.o -c /home/adamc/Documents/CSCI716/privPointLoc/src/FileSystem.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/FileSystem.cpp.o -c /home/adamc/Documents/privPointLoc/src/FileSystem.cpp
 
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/FileSystem.cpp.i"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/CSCI716/privPointLoc/src/FileSystem.cpp > CMakeFiles/privPointLoc.dir/FileSystem.cpp.i
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/FileSystem.cpp > CMakeFiles/privPointLoc.dir/FileSystem.cpp.i
 
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/FileSystem.cpp.s"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/CSCI716/privPointLoc/src/FileSystem.cpp -o CMakeFiles/privPointLoc.dir/FileSystem.cpp.s
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/FileSystem.cpp -o CMakeFiles/privPointLoc.dir/FileSystem.cpp.s
 
 # Object files for target privPointLoc
 privPointLoc_OBJECTS = \
@@ -162,8 +162,8 @@ bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/util.cpp.o
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/build.make
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/adamc/Documents/CSCI716/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable ../bin/privPointLoc"
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/privPointLoc.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable ../bin/privPointLoc"
+	cd /home/adamc/Documents/privPointLoc/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/privPointLoc.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 src/CMakeFiles/privPointLoc.dir/build: bin/privPointLoc
@@ -171,10 +171,10 @@ src/CMakeFiles/privPointLoc.dir/build: bin/privPointLoc
 .PHONY : src/CMakeFiles/privPointLoc.dir/build
 
 src/CMakeFiles/privPointLoc.dir/clean:
-	cd /home/adamc/Documents/CSCI716/privPointLoc/src && $(CMAKE_COMMAND) -P CMakeFiles/privPointLoc.dir/cmake_clean.cmake
+	cd /home/adamc/Documents/privPointLoc/src && $(CMAKE_COMMAND) -P CMakeFiles/privPointLoc.dir/cmake_clean.cmake
 .PHONY : src/CMakeFiles/privPointLoc.dir/clean
 
 src/CMakeFiles/privPointLoc.dir/depend:
-	cd /home/adamc/Documents/CSCI716/privPointLoc && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/adamc/Documents/CSCI716/privPointLoc /home/adamc/Documents/CSCI716/privPointLoc/src /home/adamc/Documents/CSCI716/privPointLoc /home/adamc/Documents/CSCI716/privPointLoc/src /home/adamc/Documents/CSCI716/privPointLoc/src/CMakeFiles/privPointLoc.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/adamc/Documents/privPointLoc && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/adamc/Documents/privPointLoc /home/adamc/Documents/privPointLoc/src /home/adamc/Documents/privPointLoc /home/adamc/Documents/privPointLoc/src /home/adamc/Documents/privPointLoc/src/CMakeFiles/privPointLoc.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : src/CMakeFiles/privPointLoc.dir/depend
 
