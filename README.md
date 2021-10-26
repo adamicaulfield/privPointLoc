@@ -12,4 +12,5 @@ This is implemented in C++, and uses HELib for the HE algorithms in C++. It also
 
 ## Contact
 Name: Adam Caulfield
+
 Email: ac77177@rit.edu
