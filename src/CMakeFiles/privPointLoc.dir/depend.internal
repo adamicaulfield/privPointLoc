@@ -109,10 +109,17 @@ src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.o
  include/Encryptor.h
  include/FileSystem.h
  include/privPointLoc.h
- include/util.h
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o
  /home/adamc/Documents/privPointLoc/src/FileSystem.cpp
  include/FileSystem.h
+src/CMakeFiles/privPointLoc.dir/Node.cpp.o
+ /home/adamc/Documents/privPointLoc/src/Node.cpp
+ include/Node.h
+ include/Tree.h
+src/CMakeFiles/privPointLoc.dir/Tree.cpp.o
+ /home/adamc/Documents/privPointLoc/src/Tree.cpp
+ include/Node.h
+ include/Tree.h
 src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.o
  /home/adamc/Documents/privPointLoc/src/helibExamples.cpp
  deps/include/NTL/ALL_FEATURES.h
@@ -323,6 +330,5 @@ src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o
  deps/include/helib/timing.h
  deps/include/helib/zzX.h
  include/Encryptor.h
-src/CMakeFiles/privPointLoc.dir/util.cpp.o
- /home/adamc/Documents/privPointLoc/src/util.cpp
- include/util.h
+ include/Node.h
+ include/Tree.h

@@ -1,12 +1,16 @@
-#include "Encryptor.h"
+//
+// Copyright SpiRITlab - Computations on Encrypted Data
+// https://gitlab.com/SpiRITlab/coed
+//
 
+
+#include "Encryptor.h"
 #include <iostream>
 #include <helib/binaryArith.h>
 #include <omp.h>
 #include "FileSystem.h"
 #include "assert.h"
 #include "privPointLoc.h"
-#include "util.h"
 
 privPointLoc::Encryptor::Encryptor(const std::string &secret_key_file_path, const std::string &public_key_file_path, long plaintextModulus, long phiM, long lifting, long numOfBitsOfModulusChain, long numOfColOfKeySwitchingMatrix)
     : plaintextModulus(plaintextModulus), phiM(phiM), lifting(lifting), numOfBitsOfModulusChain(numOfBitsOfModulusChain),

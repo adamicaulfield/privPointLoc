@@ -1,3 +1,7 @@
+//
+// Copyright SpiRITlab - Computations on Encrypted Data
+// https://gitlab.com/SpiRITlab/coed
+//
 
 #include "FileSystem.h"
 

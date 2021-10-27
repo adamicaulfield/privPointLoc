@@ -1,6 +1,10 @@
 //
 // Created by Peizhao Hu on 7/8/20.
 //
+// Copyright SpiRITlab - Computations on Encrypted Data
+// https://gitlab.com/SpiRITlab/coed
+//
+//
 
 #ifndef PRIVPOINTLOC_HELIBEXAMPLES_H
 #define PRIVPOINTLOC_HELIBEXAMPLES_H

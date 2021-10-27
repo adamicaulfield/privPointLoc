@@ -1,6 +1,6 @@
 //
-// Copyright SpiRITlab - The PRIVPOINTLOC project.
-// https://github.com/SpiRITlab/PRIVPOINTLOC
+// Copyright SpiRITlab - Computations on Encrypted Data
+// https://gitlab.com/SpiRITlab/coed
 //
 
 #ifndef PRIVPOINTLOC_FILESYSTEM_H

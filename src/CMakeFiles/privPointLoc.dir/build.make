@@ -118,22 +118,9 @@ src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/helibExamples.cpp.s"
 	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/helibExamples.cpp -o CMakeFiles/privPointLoc.dir/helibExamples.cpp.s
 
-src/CMakeFiles/privPointLoc.dir/util.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
-src/CMakeFiles/privPointLoc.dir/util.cpp.o: src/util.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/privPointLoc.dir/util.cpp.o"
-	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/util.cpp.o -c /home/adamc/Documents/privPointLoc/src/util.cpp
-
-src/CMakeFiles/privPointLoc.dir/util.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/util.cpp.i"
-	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/util.cpp > CMakeFiles/privPointLoc.dir/util.cpp.i
-
-src/CMakeFiles/privPointLoc.dir/util.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/util.cpp.s"
-	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/util.cpp -o CMakeFiles/privPointLoc.dir/util.cpp.s
-
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o: src/FileSystem.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o"
 	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/FileSystem.cpp.o -c /home/adamc/Documents/privPointLoc/src/FileSystem.cpp
 
 src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.i: cmake_force
@@ -144,13 +131,40 @@ src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/FileSystem.cpp.s"
 	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/FileSystem.cpp -o CMakeFiles/privPointLoc.dir/FileSystem.cpp.s
 
+src/CMakeFiles/privPointLoc.dir/Tree.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
+src/CMakeFiles/privPointLoc.dir/Tree.cpp.o: src/Tree.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/privPointLoc.dir/Tree.cpp.o"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/Tree.cpp.o -c /home/adamc/Documents/privPointLoc/src/Tree.cpp
+
+src/CMakeFiles/privPointLoc.dir/Tree.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/Tree.cpp.i"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/Tree.cpp > CMakeFiles/privPointLoc.dir/Tree.cpp.i
+
+src/CMakeFiles/privPointLoc.dir/Tree.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/Tree.cpp.s"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/Tree.cpp -o CMakeFiles/privPointLoc.dir/Tree.cpp.s
+
+src/CMakeFiles/privPointLoc.dir/Node.cpp.o: src/CMakeFiles/privPointLoc.dir/flags.make
+src/CMakeFiles/privPointLoc.dir/Node.cpp.o: src/Node.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/CMakeFiles/privPointLoc.dir/Node.cpp.o"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/privPointLoc.dir/Node.cpp.o -c /home/adamc/Documents/privPointLoc/src/Node.cpp
+
+src/CMakeFiles/privPointLoc.dir/Node.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/privPointLoc.dir/Node.cpp.i"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/adamc/Documents/privPointLoc/src/Node.cpp > CMakeFiles/privPointLoc.dir/Node.cpp.i
+
+src/CMakeFiles/privPointLoc.dir/Node.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/privPointLoc.dir/Node.cpp.s"
+	cd /home/adamc/Documents/privPointLoc/src && /usr/bin/g++-7 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/adamc/Documents/privPointLoc/src/Node.cpp -o CMakeFiles/privPointLoc.dir/Node.cpp.s
+
 # Object files for target privPointLoc
 privPointLoc_OBJECTS = \
 "CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o" \
 "CMakeFiles/privPointLoc.dir/Encryptor.cpp.o" \
 "CMakeFiles/privPointLoc.dir/helibExamples.cpp.o" \
-"CMakeFiles/privPointLoc.dir/util.cpp.o" \
-"CMakeFiles/privPointLoc.dir/FileSystem.cpp.o"
+"CMakeFiles/privPointLoc.dir/FileSystem.cpp.o" \
+"CMakeFiles/privPointLoc.dir/Tree.cpp.o" \
+"CMakeFiles/privPointLoc.dir/Node.cpp.o"
 
 # External object files for target privPointLoc
 privPointLoc_EXTERNAL_OBJECTS =
@@ -158,11 +172,12 @@ privPointLoc_EXTERNAL_OBJECTS =
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/Encryptor.cpp.o
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.o
-bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/util.cpp.o
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o
+bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/Tree.cpp.o
+bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/Node.cpp.o
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/build.make
 bin/privPointLoc: src/CMakeFiles/privPointLoc.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable ../bin/privPointLoc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/adamc/Documents/privPointLoc/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable ../bin/privPointLoc"
 	cd /home/adamc/Documents/privPointLoc/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/privPointLoc.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
