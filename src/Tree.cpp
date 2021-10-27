@@ -51,31 +51,54 @@ void privPointLoc::Tree::insertNode(privPointLoc::Node * node){
 		}
 	}
 	size++;
-	printf("Balancing tree...\n");
+	// printf("Balancing tree...\n");
 	balanceTree(root);
+	printf("---------- After insert ----------\n");
+	printTree(root);
+	printf("----------------------------------\n");
 }
 
-void privPointLoc::Tree::balanceTree(Node * curNode){
-	int bf = curNode->rightCount - curNode->leftCount;
+void privPointLoc::Tree::balanceTree(Node * z){
+	/*
+	* Inspiration from: https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
+	* In this explanation, z and y are nodes. Node z identifies there is unbalance,
+	* and Node y determines the type of rotation needed.
+	*/
+
+	int bf = z->rightCount - z->leftCount;
 
 	if(bf > 1){ //right
-		Node * nextNode = curNode->getRight();
-		int bfr = nextNode->rightCount - curNode->leftCount;
-		if(std::abs(bfr)>1){
-			balanceTree(nextNode);
-		} else{
-			// rotate left
-		}
-	} else if(bf < -1){ // left
-		Node * nextNode = curNode->getLeft();
-		int bfr = nextNode->rightCount - curNode->leftCount;
-		if(std::abs(bfr)>1){
-			balanceTree(nextNode);
-		} else{
-			// rotate right
-		}
-	}
+		printf("--RIGHT UNBALANCED--\n");
+		Node * y = z->getRight();
+		int bfy = y->rightCount - y->leftCount;		
+		if(bfy > 0){ // right right case
+			printf("--handling right-right case--\n");
+			// Rotate the tree to the left pivoting on Y
+			Node * yLeft = y->getLeft();
+			z->setRight(yLeft);
+			y->setLeft(z);
 
+			//if z was previously the root, update the root to be y;
+			if(root == z){
+				root = y;
+			}
+
+		} 
+		// else if(bfr < -1){ // left right case
+					
+		// }
+	} 
+	// else if(bf < -1){ // left
+	// 	Node * y = z->getRight();
+	// 	int bfl = y->rightCount - z->leftCount;
+	// 	if(bfl>1){ // right left case
+			
+	// 	} else if(bfl < -1){ // left left case
+			
+	// 	}
+	// } else{
+	// 	return;
+	// }
 }
 
 

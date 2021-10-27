@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
                 privPointLoc::Node * newNode =  new  privPointLoc::Node(tree, i);
                 tree->insertNode(newNode);
             }
-            printf("After inserting nodes...\n");
+            printf("FINAL:\n");
             tree->printTree(tree->getRoot());
         }
     }
