@@ -12,7 +12,7 @@
 #include "assert.h"
 #include "privPointLoc.h"
 
-privPointLoc::Encryptor::Encryptor(const std::string &secret_key_file_path, const std::string &public_key_file_path, long plaintextModulus, long phiM, long lifting, long numOfBitsOfModulusChain, long numOfColOfKeySwitchingMatrix)
+Encryptor::Encryptor(const std::string &secret_key_file_path, const std::string &public_key_file_path, long plaintextModulus, long phiM, long lifting, long numOfBitsOfModulusChain, long numOfColOfKeySwitchingMatrix)
     : plaintextModulus(plaintextModulus), phiM(phiM), lifting(lifting), numOfBitsOfModulusChain(numOfBitsOfModulusChain),
       numOfColOfKeySwitchingMatrix(numOfColOfKeySwitchingMatrix) {
 
@@ -22,11 +22,11 @@ privPointLoc::Encryptor::Encryptor(const std::string &secret_key_file_path, cons
     std::cout << "Building modulus chain..." << std::endl;
     buildModChain(*context, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
 
-    privPointLoc::FileSystem sk_fs(secret_key_file_path);
+    FileSystem sk_fs(secret_key_file_path);
     sk_fs.open_output_stream(std::fstream::trunc);
     std::ofstream &sk_fs_of = sk_fs.get_output_stream();
 
-    privPointLoc::FileSystem pk_fs(public_key_file_path);
+    FileSystem pk_fs(public_key_file_path);
     pk_fs.open_output_stream(std::fstream::trunc);
     std::ofstream &pk_fs_of = pk_fs.get_output_stream();
 
@@ -64,7 +64,7 @@ privPointLoc::Encryptor::Encryptor(const std::string &secret_key_file_path, cons
     pk_fs.close_output_stream();
 }
 
-privPointLoc::Encryptor::Encryptor(const std::string &private_key_file_path, const std::string &public_key_file_path, long plaintextModulus, long lifting, long numOfBitsOfModulusChain, long numOfColOfKeySwitchingMatrix, long desiredSlotCount, long securityLevel)
+Encryptor::Encryptor(const std::string &private_key_file_path, const std::string &public_key_file_path, long plaintextModulus, long lifting, long numOfBitsOfModulusChain, long numOfColOfKeySwitchingMatrix, long desiredSlotCount, long securityLevel)
         : plaintextModulus(plaintextModulus), lifting(lifting), numOfBitsOfModulusChain(numOfBitsOfModulusChain),
           numOfColOfKeySwitchingMatrix(numOfColOfKeySwitchingMatrix), desiredSlotCount(desiredSlotCount), securityLevel(securityLevel) {
     /**
@@ -84,12 +84,12 @@ privPointLoc::Encryptor::Encryptor(const std::string &private_key_file_path, con
     Encryptor(private_key_file_path, public_key_file_path, plaintextModulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
 }
 
-privPointLoc::Encryptor::Encryptor(const std::string &secret_key_file_path, const std::string &public_key_file_path) {
-    privPointLoc::FileSystem sk_fs(secret_key_file_path);
+Encryptor::Encryptor(const std::string &secret_key_file_path, const std::string &public_key_file_path) {
+    FileSystem sk_fs(secret_key_file_path);
     sk_fs.open_input_stream();
     std::ifstream &sk_fs_if = sk_fs.get_input_stream();
 
-    privPointLoc::FileSystem pk_fs(public_key_file_path);
+    FileSystem pk_fs(public_key_file_path);
     pk_fs.open_input_stream();
     std::ifstream &pk_fs_if = pk_fs.get_input_stream();
 
@@ -114,7 +114,7 @@ privPointLoc::Encryptor::Encryptor(const std::string &secret_key_file_path, cons
     pk_fs.close_input_stream();
 }
 
-privPointLoc::Encryptor::~Encryptor() {
+Encryptor::~Encryptor() {
 //    if(context != nullptr)
 //        delete context;
 //    if(secret_key != nullptr)
@@ -122,7 +122,7 @@ privPointLoc::Encryptor::~Encryptor() {
 }
 
 void
-privPointLoc::Encryptor::testEncryption() {
+Encryptor::testEncryption() {
     // Get the number of slot (phi(m))
     long nslots = encrypted_array->size();
     std::cout << "Number of slots: " << nslots << std::endl;
@@ -181,14 +181,14 @@ privPointLoc::Encryptor::testEncryption() {
 }
 
 void
-privPointLoc::Encryptor::decryptAndPrint(const std::string &msg, const helib::Ctxt &ctxt) {
+Encryptor::decryptAndPrint(const std::string &msg, const helib::Ctxt &ctxt) {
     helib::Ptxt<helib::BGV> dec_ptxt(*(this->context));
     this->secret_key->Decrypt(dec_ptxt, ctxt);
     std::cout << "Decrypt(" << msg << "): " << dec_ptxt << std::endl;
 }
 
 void
-privPointLoc::Encryptor::decryptAndPrintCondensed(const std::string &msg, const helib::Ctxt &ctxt, int size){
+Encryptor::decryptAndPrintCondensed(const std::string &msg, const helib::Ctxt &ctxt, int size){
     std::vector<long> dec_ptxt(this->getEncryptedArray()->size());
     this->getEncryptedArray()->decrypt(ctxt, *(this->secret_key), dec_ptxt);
     std::cout << "Decrypt(" << msg << "):";// << std::endl;
@@ -199,26 +199,26 @@ privPointLoc::Encryptor::decryptAndPrintCondensed(const std::string &msg, const 
 }
 
 helib::Context *
-privPointLoc::Encryptor::getContext() const {
+Encryptor::getContext() const {
     return context;
 }
 
 helib::SecKey *
-privPointLoc::Encryptor::getSecretKey() const {
+Encryptor::getSecretKey() const {
     return secret_key;
 }
 
 helib::PubKey *
-privPointLoc::Encryptor::getPublicKey() const {
+Encryptor::getPublicKey() const {
     return public_key;
 }
 
 helib::EncryptedArray *
-privPointLoc::Encryptor::getEncryptedArray() const {
+Encryptor::getEncryptedArray() const {
     return encrypted_array;
 }
 
 int
-privPointLoc::Encryptor::getSlotCount() {
+Encryptor::getSlotCount() {
     return this->encrypted_array->size();
 }

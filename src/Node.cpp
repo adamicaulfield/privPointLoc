@@ -3,46 +3,78 @@
 
 #include "Node.h"
 
-privPointLoc::Node::Node(Tree * t, int v){
-	leftNode = nullptr;
-	rightNode = nullptr;
+Node::Node(Tree * t, Segment * seg, NodeType ty){
+	left = nullptr;
+	right = nullptr;
+	s = seg;
 	tree = t;
-	value = v;
+	type = ty;
 	leftCount = 0;
 	rightCount = 0;
 }
 
-void privPointLoc::Node::setValue(int v){
+void Node::setValue(int v){
 	value = v;
 }
 
-int privPointLoc::Node::getValue(){
+int Node::getValue(){
 	return value;
 }
 
-// Get pointer to  left node
-privPointLoc::Node * privPointLoc::Node::getLeft(){
-	return leftNode;
+void Node::setNodeType(NodeType t){
+	type = t;
 }
 
-// Get pointer to right node
-privPointLoc::Node * privPointLoc::Node::getRight(){
-	return rightNode;
+NodeType Node::getNodeType(){
+	return type;
 }
 
 // Get pointer to  left node
-void privPointLoc::Node::setLeft(privPointLoc::Node * node){
-	leftNode = node;
+Node * Node::getLeft(){
+	return left;
 }
 
 // Get pointer to right node
-void privPointLoc::Node::setRight(privPointLoc::Node * node){
-	rightNode = node;
+Node * Node::getRight(){
+	return right;
 }
 
+// Get pointer to  left node
+void Node::setLeft(Node * node){
+	left = node;
+}
+
+// Get pointer to right node
+void Node::setRight(Node * node){
+	right = node;
+}
+
+Segment * Node::getSegment(){
+	return s;
+}
 
 // Get pointer to tree, which this node is in
-privPointLoc::Tree * privPointLoc::Node::getTree(){
+Tree * Node::getTree(){
 	return tree;
 }
 
+void Node::setIsRight(bool b){
+	isRight = b;
+}
+
+bool Node::getIsRight(){
+	return isRight;
+}
+
+void Node::setMatrixParams(int v, std::string s){
+	matrixIndex = v;
+	matrixLabel = s;
+}
+
+int Node::getMatrixIndex(){
+	return matrixIndex;
+}
+
+std::string Node::getMatrixLabel(){
+	return matrixLabel;
+}

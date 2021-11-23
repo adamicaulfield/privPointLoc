@@ -7,44 +7,68 @@
 #include <math.h>
 #include "Tree.h"
 #include "Node.h"
+#include "Segment.h"
 #include <stdlib.h>     /* atoi */
 
 std::vector<long> encodePoint(int maxBits, std::vector<int> point, int nSlots);
-void secureLT(privPointLoc::Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt pointCtxt, helib::Ptxt<helib::BGV> ptxt, int y);
-void secureGT(privPointLoc::Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt pointCtxt, helib::Ptxt<helib::BGV> ptxt, int y);
+void secureLT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt pointCtxt, helib::Ptxt<helib::BGV> ptxt, int y);
+void secureGT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt pointCtxt, helib::Ptxt<helib::BGV> ptxt, int y);
 
 int main(int argc, char **argv) {
-    if (argc==0){
+    if (argc<2){
+        printf("-------------------- START MAIN -------------------- \n");
+        
+        Tree * tree = new Tree();
+
+        printf("----- PHASE 1: Read from file, insert into Tree/DAG -----\n");
+        tree->readSegmentsFile("data/ac7717.txt");
+        
+        printf("----- Print Tree/DAG after read file and insert segments -----\n");
+        tree->printTree(tree->getRoot());
+
+        // Segment * s0 = new Segment(2,5,5,7);
+        // Segment * s1 = new Segment(4,3,8,4);
+        
+        // tree->insert(s0);
+        // tree->insert(s1);
+
+        printf("----- PHASE 2: Write to Adjacency Matrix -----\n");
+        tree->setupLists(tree->getRoot());
+        tree->initAdjacencyMatrix();
+        tree->writeAdjacencyMatrix(tree->getRoot());
+        tree->wrireSumsAdjacencyMatrix();
+        // tree->printAdjacencyMatrix();
+        tree->writeAdjacencyMatrixToFile("data/adjMatrix.csv");
+
+        printf("---- PHASE 3: Enter a Point in the form \"x y\" to discover which trapezoid it is located in: \n");
+        std::string pointStr;
+        std::cout << "POINT: ";
+        std::getline(std::cin,pointStr);
+        std::cout << pointStr;
+        
+        std::stringstream ss;
+
+        int x,y;
+
+        ss << pointStr;
+        ss >> x >> y;
+        printf("\nFINDING POINT: (%d,%d)\n", x,y);
+        tree->findPoint(x,y, tree->getRoot());
+    } 
+    else{
         unsigned long plaintext_prime_modulus = 2;
         unsigned long phiM = 21845;
         unsigned long lifting = 1;
         unsigned long numOfBitsOfModulusChain = 256;
         unsigned long numOfColOfKeySwitchingMatrix = 2;  
-        // unsigned long desiredSlotCount = 64;
-        // unsigned long securityLevel = 128;
+        
         printf("------ Initialize Encryptor Object ------\n");
-        privPointLoc::Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt",
-                                   plaintext_prime_modulus,
-                                   phiM,
-                                   lifting,
-                                   numOfBitsOfModulusChain,
-                                   numOfColOfKeySwitchingMatrix);
-                                   // desiredSlotCount,
-                                   // securityLevel);
-
+        Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus,phiM,lifting,numOfBitsOfModulusChain,numOfColOfKeySwitchingMatrix);
         printf("------ Done ------\n\n");
         int nSlots = encryptor.getEncryptedArray()->size();
         // std::cout << "Slot count: " << nSlots << std::endl;
 
         int totalPoints = 3;
-
-        std::vector<int> xVertices = {0,10,5};
-        std::vector<int> yVertices = {10,10,0};
-
-        // printf("Region vertices: \n");
-        // for(int i=0; i<totalPoints; i++){
-        //     std::cout << xVertices[i] << "," << yVertices[i] << std::endl;
-        // }
 
         int maxBits = 4;
 
@@ -74,20 +98,7 @@ int main(int argc, char **argv) {
         secureGT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
 
         secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
-    } else{
-        int mode = atoi(argv[1]);
-        int total = atoi(argv[2]);
-        if(mode==1){
-            privPointLoc::Tree * tree = new privPointLoc::Tree();
-            for(int i=0; i<total; i++){
-                privPointLoc::Node * newNode =  new  privPointLoc::Node(tree, i);
-                tree->insertNode(newNode);
-            }
-            printf("FINAL:\n");
-            tree->printTree(tree->getRoot());
-        }
-    }
-    
+    }   
 }
 
 std::vector<long> encodePoint(int maxBits, std::vector<int> point, int nSlots){
@@ -101,7 +112,7 @@ std::vector<long> encodePoint(int maxBits, std::vector<int> point, int nSlots){
   return pointBits;
 }
 
-void secureGT(privPointLoc::Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
+void secureGT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
     printf("--------Starting secureGT-------\n");
     helib::Ptxt<helib::BGV> mask (*(encryptor.getContext()));
     for(int i=0; i<maxBits; i++){
@@ -138,7 +149,7 @@ void secureGT(privPointLoc::Encryptor encryptor, int maxBits, int nSlots, helib:
     printf("--------Done-------\n\n");
 }
 
-void secureLT(privPointLoc::Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
+void secureLT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
     printf("--------Starting secureLT-------\n");
     helib::Ptxt<helib::BGV> mask (*(encryptor.getContext()));
 

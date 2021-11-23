@@ -114,10 +114,17 @@ src/CMakeFiles/privPointLoc.dir/FileSystem.cpp.o: include/FileSystem.h
 
 src/CMakeFiles/privPointLoc.dir/Node.cpp.o: src/Node.cpp
 src/CMakeFiles/privPointLoc.dir/Node.cpp.o: include/Node.h
+src/CMakeFiles/privPointLoc.dir/Node.cpp.o: include/Segment.h
 src/CMakeFiles/privPointLoc.dir/Node.cpp.o: include/Tree.h
+
+src/CMakeFiles/privPointLoc.dir/Segment.cpp.o: src/Segment.cpp
+src/CMakeFiles/privPointLoc.dir/Segment.cpp.o: include/Node.h
+src/CMakeFiles/privPointLoc.dir/Segment.cpp.o: include/Segment.h
+src/CMakeFiles/privPointLoc.dir/Segment.cpp.o: include/Tree.h
 
 src/CMakeFiles/privPointLoc.dir/Tree.cpp.o: src/Tree.cpp
 src/CMakeFiles/privPointLoc.dir/Tree.cpp.o: include/Node.h
+src/CMakeFiles/privPointLoc.dir/Tree.cpp.o: include/Segment.h
 src/CMakeFiles/privPointLoc.dir/Tree.cpp.o: include/Tree.h
 
 src/CMakeFiles/privPointLoc.dir/helibExamples.cpp.o: src/helibExamples.cpp
@@ -330,5 +337,6 @@ src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: deps/include/helib/timing.h
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: deps/include/helib/zzX.h
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: include/Encryptor.h
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: include/Node.h
+src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: include/Segment.h
 src/CMakeFiles/privPointLoc.dir/privPointLoc.cpp.o: include/Tree.h
 
