@@ -35,20 +35,20 @@ void Segment::setRightEndpoint(int xr, int yr){
 }
 
 void Segment::initDual(){
-	printf("ENDPOINT_R: [%d, %d]\t ENDPOINT_L [%d, %d]\n", rightEndpoint[0], rightEndpoint[1], leftEndpoint[0], leftEndpoint[1]);
+	// printf("ENDPOINT_R: [%d, %d]\t ENDPOINT_L [%d, %d]\n", rightEndpoint[0], rightEndpoint[1], leftEndpoint[0], leftEndpoint[1]);
 	if(rightEndpoint[1]==leftEndpoint[1]){
-		printf("Slope = zero\n");
+		// printf("Slope = zero\n");
 		slope = 0;
 	} else {
-		printf("Slope = %d/%d\n", rightEndpoint[1]-leftEndpoint[1], rightEndpoint[0]-leftEndpoint[0]);
+		// printf("Slope = %d/%d\n", rightEndpoint[1]-leftEndpoint[1], rightEndpoint[0]-leftEndpoint[0]);
 		slope = double(rightEndpoint[1]-leftEndpoint[1]) / double(rightEndpoint[0]-leftEndpoint[0]);
 	}
 
-	intercept = leftEndpoint[1]-int((slope*leftEndpoint[0]));
+	intercept = int(double(leftEndpoint[1])-slope*double(leftEndpoint[0])+0.5f);
 }
 
 int Segment::getYonSeg(int x){
-	return int(slope*x+intercept);
+	return int(slope*double(x)+double(intercept)+0.5f);
 }
 
 int Segment::getSegID(){

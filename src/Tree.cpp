@@ -215,7 +215,7 @@ void Tree::insert(Segment * s){
 	totalSegments++;
 	size++;
 	printf("Done\n");
-	printTree(root);
+	// printTree(root);
 }
 
 void Tree::addLeafNodes(Node * node){

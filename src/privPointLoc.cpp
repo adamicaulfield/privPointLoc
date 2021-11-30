@@ -9,12 +9,11 @@
 #include "Node.h"
 #include "Segment.h"
 #include <stdlib.h>     /* atoi */
-
-std::vector<long> encodePoint(int maxBits, std::vector<int> point, int nSlots);
-void secureLT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt pointCtxt, helib::Ptxt<helib::BGV> ptxt, int y);
-void secureGT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt pointCtxt, helib::Ptxt<helib::BGV> ptxt, int y);
+#include "PrivPointUtil.h"
 
 int main(int argc, char **argv) {
+    PrivPointUtil * privUtil = new PrivPointUtil();
+
     if (argc<2){
         printf("-------------------- START MAIN -------------------- \n");
         
@@ -73,12 +72,12 @@ int main(int argc, char **argv) {
         int maxBits = 4;
 
         std::vector<int> point = {5,11};
-        std::vector<long> pointBits = encodePoint(maxBits, point, nSlots);
+        std::vector<long> pointBits = privUtil->encodePoint(maxBits, point, nSlots);
         helib::Ctxt pointCtxt (*(encryptor.getPublicKey()));
         encryptor.getEncryptedArray()->encrypt(pointCtxt, *(encryptor.getPublicKey()), pointBits);
 
         std::vector<int> regionVertex = {10,10};
-        std::vector<long> regionVertexBits = encodePoint(maxBits, regionVertex, nSlots);
+        std::vector<long> regionVertexBits = privUtil->encodePoint(maxBits, regionVertex, nSlots);
 
         printf("point(%d,%d) in bits: ",point[0],point[1]);
         for(int i=0; i<maxBits*2; i++){
@@ -94,95 +93,11 @@ int main(int argc, char **argv) {
         }
         std::cout << "\n" << std::endl;
 
+        privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 0);
+
         printf("Compare by y coordinate:\n");
-        secureGT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
+        privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
 
-        secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
+        privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
     }   
-}
-
-std::vector<long> encodePoint(int maxBits, std::vector<int> point, int nSlots){
-  std::vector<long> pointBits(nSlots,0);
-  
-  for(int i=0; i<maxBits; i++){
-    pointBits[i] = long(point[0]/(pow(2,i)))%2;
-    pointBits[i+maxBits] = long(point[1]/(pow(2,i)))%2; // y coordinate
-  }
-
-  return pointBits;
-}
-
-void secureGT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
-    printf("--------Starting secureGT-------\n");
-    helib::Ptxt<helib::BGV> mask (*(encryptor.getContext()));
-    for(int i=0; i<maxBits; i++){
-        mask[i+maxBits*y] = 1;
-    }
-    // Compares if ctxt > ptxt
-    // Binary A > B --> A and not B
-    helib::Ptxt<helib::BGV> notOp (*(encryptor.getContext())); // plaintext vector set to ones for 'not' operation 
-    for(int i=0; i<nSlots; i++){
-        notOp[i] = 1;
-    }
-    a.multByConstant(mask);
-    b.multiplyBy(mask);
-
-    // encryptor.decryptAndPrintCondensed("pointCtxt", a, 2*maxBits);
-
-    b += notOp; // b now contains not B
-    a.multByConstant(b); // a contains A and not B
-    // encryptor.decryptAndPrintCondensed("individual ctxt >= ptxt", a, 2*maxBits);
-    
-    // Individual gt results are in each slot of a.
-    helib::Ctxt tmp = a;
-    tmp.addConstant(notOp); // not of results'
-
-    encryptor.getEncryptedArray()->rotate(tmp, -1);
-    // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
-    for(int i=1; i<maxBits; i++){
-        a.multiplyBy(tmp);
-        encryptor.getEncryptedArray()->rotate(tmp, -1);
-        // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
-    }
-    helib::totalSums(*encryptor.getEncryptedArray(), a);
-    encryptor.decryptAndPrintCondensed("ctxt > ptxt", a, 1);
-    printf("--------Done-------\n\n");
-}
-
-void secureLT(Encryptor encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
-    printf("--------Starting secureLT-------\n");
-    helib::Ptxt<helib::BGV> mask (*(encryptor.getContext()));
-
-    for(int i=0; i<maxBits; i++){
-        mask[i+maxBits*y] = 1;
-    }
-    // Compares if ctxt > ptxt
-    // Binary A > B --> A and not B
-    helib::Ptxt<helib::BGV> notOp (*(encryptor.getContext())); // plaintext vector set to ones for 'not' operation 
-    for(int i=0; i<nSlots; i++){
-        notOp[i] = 1;
-    }
-    a.multByConstant(mask);
-    b.multiplyBy(mask);
-
-    // encryptor.decryptAndPrintCondensed("pointCtxt", a, 2*maxBits);
-
-    a.addConstant(notOp); // a now contains not a
-    a.multByConstant(b); // a contains not A and B
-    // encryptor.decryptAndPrintCondensed("individual ctxt >= ptxt", a, 2*maxBits);
-    
-    // Individual gt results are in each slot of a.
-    helib::Ctxt tmp = a;
-    tmp.addConstant(notOp); // not of results'
-
-    encryptor.getEncryptedArray()->rotate(tmp, -1);
-    // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
-    for(int i=1; i<maxBits; i++){
-        a.multiplyBy(tmp);
-        encryptor.getEncryptedArray()->rotate(tmp, -1);
-        // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
-    }
-    helib::totalSums(*encryptor.getEncryptedArray(), a);
-    encryptor.decryptAndPrintCondensed("ctxt < ptxt", a, 1);
-    printf("--------Done-------\n\n");
 }

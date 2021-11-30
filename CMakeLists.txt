@@ -33,7 +33,8 @@ set(SOURCE_FILES
         ${SOURCES_DIR}/FileSystem.cpp
         ${SOURCES_DIR}/Tree.cpp
         ${SOURCES_DIR}/Segment.cpp
-        ${SOURCES_DIR}/Node.cpp)
+        ${SOURCES_DIR}/Node.cpp
+        ${SOURCES_DIR}/PrivPointUtil.cpp)
 set_source_files_properties(${SOURCE_FILES} PROPERTIES LANGUAGE CXX)
 
 include_directories(${DEPS_INCLUDE_PATH} src include /usr/local/include)
