@@ -15,7 +15,7 @@ Segment::Segment(int xl, int yl, int xr, int yr){
 	leftEndpoint = {xl, yl};
 	rightEndpoint = {xr, yr};
 	this->initDual();
-	printf("SEG INITIALIZED: (slope=%d, intercept=%d)\n", slope, intercept);
+	printf("SEG INITIALIZED: (slope=%.2f, intercept=%d)\n", slope, intercept);	
 }
 
 std::vector<int> Segment::getLeftEndpoint(){
@@ -35,17 +35,20 @@ void Segment::setRightEndpoint(int xr, int yr){
 }
 
 void Segment::initDual(){
+	printf("ENDPOINT_R: [%d, %d]\t ENDPOINT_L [%d, %d]\n", rightEndpoint[0], rightEndpoint[1], leftEndpoint[0], leftEndpoint[1]);
 	if(rightEndpoint[1]==leftEndpoint[1]){
+		printf("Slope = zero\n");
 		slope = 0;
 	} else {
-		slope = int((rightEndpoint[1]-leftEndpoint[1])/rightEndpoint[0]-leftEndpoint[0]);
+		printf("Slope = %d/%d\n", rightEndpoint[1]-leftEndpoint[1], rightEndpoint[0]-leftEndpoint[0]);
+		slope = double(rightEndpoint[1]-leftEndpoint[1]) / double(rightEndpoint[0]-leftEndpoint[0]);
 	}
 
-	intercept = leftEndpoint[1]-slope*leftEndpoint[0];
+	intercept = leftEndpoint[1]-int((slope*leftEndpoint[0]));
 }
 
 int Segment::getYonSeg(int x){
-	return slope*x+intercept;
+	return int(slope*x+intercept);
 }
 
 int Segment::getSegID(){

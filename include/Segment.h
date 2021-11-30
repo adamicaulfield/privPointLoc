@@ -30,7 +30,7 @@ public:
     int getYonSeg(int);
 
 private:
-    int slope;
+    double slope;
     int intercept;
     int nodeListSize = 0;
     int id;
