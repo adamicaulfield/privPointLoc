@@ -106,25 +106,32 @@ void Tree::insert(Segment * s){
 		Node * prevNode;
 		NodeType searchNodeType = searchNode->getNodeType();
 		bool dir = true;
+		int value;
 		// printf("Starting LEFT while loop...\n");
 		while(searchNodeType != NodeType::leaf){
 			prevNode = searchNode;
 			switch(searchNodeType){	
 				case NodeType::x:
+					value = searchNode->getValue();
 					if(xl <= searchNode->getValue()){
+						printf("\tX: %d <= %d-->\n", xl, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
+						printf("\tX: %d > %d-->\n", xl, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
 					break;
 				
 				case NodeType::y:
+					value = searchNode->getSegment()->getYonSeg(xl);
 					if(yl <= searchNode->getSegment()->getYonSeg(xl)){
+						printf("\tY: %d <= %d-->\n", yl, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
+						printf("\tY: %d > %d-->\n", yl, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -156,20 +163,26 @@ void Tree::insert(Segment * s){
 			prevNode = searchNode;
 			switch(searchNodeType){	
 				case NodeType::x:
-					if(xr < searchNode->getValue()){
+					value = searchNode->getValue();
+					if(xr <= searchNode->getValue()){
+						printf("\tX: %d <= %d-->\n", xr, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
+						printf("\tX: %d > %d-->\n", xr, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
 					break;
 				
 				case NodeType::y:
-					if(yr < searchNode->getSegment()->getYonSeg(xr)){
+					value = searchNode->getSegment()->getYonSeg(xr);
+					if(yr <= searchNode->getSegment()->getYonSeg(xr)){
+						printf("\tY: %d <= %d-->\n", yr, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
+						printf("\tY: %d > %d-->\n", yr, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -202,6 +215,7 @@ void Tree::insert(Segment * s){
 	totalSegments++;
 	size++;
 	printf("Done\n");
+	printTree(root);
 }
 
 void Tree::addLeafNodes(Node * node){

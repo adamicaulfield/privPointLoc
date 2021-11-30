@@ -15,6 +15,7 @@ Segment::Segment(int xl, int yl, int xr, int yr){
 	leftEndpoint = {xl, yl};
 	rightEndpoint = {xr, yr};
 	this->initDual();
+	printf("SEG INITIALIZED: (slope=%d, intercept=%d)\n", slope, intercept);
 }
 
 std::vector<int> Segment::getLeftEndpoint(){
@@ -34,7 +35,12 @@ void Segment::setRightEndpoint(int xr, int yr){
 }
 
 void Segment::initDual(){
-	slope = int((rightEndpoint[1]-leftEndpoint[1])/rightEndpoint[0]-leftEndpoint[0]);
+	if(rightEndpoint[1]==leftEndpoint[1]){
+		slope = 0;
+	} else {
+		slope = int((rightEndpoint[1]-leftEndpoint[1])/rightEndpoint[0]-leftEndpoint[0]);
+	}
+
 	intercept = leftEndpoint[1]-slope*leftEndpoint[0];
 }
 

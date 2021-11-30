@@ -40,20 +40,20 @@ int main(int argc, char **argv) {
         // tree->printAdjacencyMatrix();
         tree->writeAdjacencyMatrixToFile("data/adjMatrix.csv");
 
-        printf("---- PHASE 3: Enter a Point in the form \"x y\" to discover which trapezoid it is located in: \n");
-        std::string pointStr;
-        std::cout << "POINT: ";
-        std::getline(std::cin,pointStr);
-        std::cout << pointStr;
+        // printf("---- PHASE 3: Enter a Point in the form \"x y\" to discover which trapezoid it is located in: \n");
+        // std::string pointStr;
+        // std::cout << "POINT: ";
+        // std::getline(std::cin,pointStr);
+        // std::cout << pointStr;
         
-        std::stringstream ss;
+        // std::stringstream ss;
 
-        int x,y;
+        // int x,y;
 
-        ss << pointStr;
-        ss >> x >> y;
-        printf("\nFINDING POINT: (%d,%d)\n", x,y);
-        tree->findPoint(x,y, tree->getRoot());
+        // ss << pointStr;
+        // ss >> x >> y;
+        // printf("\nFINDING POINT: (%d,%d)\n", x,y);
+        // tree->findPoint(x,y, tree->getRoot());
     } 
     else{
         unsigned long plaintext_prime_modulus = 2;
