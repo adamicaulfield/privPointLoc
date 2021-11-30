@@ -29,9 +29,13 @@ public:
 
     int getYonSeg(int);
 
+    int getIntercept();
+    int getDx();
+    int getDy();
+
 private:
     double slope;
-    int intercept;
+    int intercept, dx, dy;
     int nodeListSize = 0;
     int id;
     std::vector<int> rightEndpoint;

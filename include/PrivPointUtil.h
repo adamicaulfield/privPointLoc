@@ -9,10 +9,11 @@
 class PrivPointUtil {
 public:
     PrivPointUtil();
-    std::vector<long> encodePoint(int, std::vector<int>, int nSlots);
-    void secureLT(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>, int);
-    void secureGT(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>, int);
-    void binaryMult(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>, int);
+    // std::vector<long> encodePoint(int, std::vector<int>, int);
+    std::vector<long> encodePoint(int, int, int);
+    helib::Ctxt secureLT(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>);
+    helib::Ctxt secureGT(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>);
+    helib::Ctxt binaryMult(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>, int);
 };
 
 #endif /*PRIVPOINTLOC_PRIVPOINTUTIL_H*/

@@ -455,7 +455,7 @@ void Tree::wrireSumsAdjacencyMatrix(){
 void Tree::printAdjacencyMatrix(){
 	for(int i=0; i<adjMatrix.size(); i++){
 		for(int j=0; j<adjMatrix[0].size(); j++){
-			std::cout << adjMatrix[i][j] << "\t";
+			std::cout << adjMatrix[i][j] << "    ";
 		}
 		std::cout << std::endl;
 	}
@@ -503,3 +503,53 @@ void Tree::findPoint(int x, int y, Node * startNode){
 		}
 	}
 }
+
+/*
+void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
+	if(startNode != nullptr){
+		NodeType nt = startNode->getNodeType();
+		if(nt == NodeType::x){
+
+			// Convert vectex X Point to bin
+			std::vector<long> xVertex = privUtil->encodePoint(maxBits, startNode->getValue(), nSlots);
+			helib::Ptxt<helib::BGV> xVertexPtxt (*(encryptor.getContext()));
+			for(int i=0; i<2*maxbits; i++){
+				xVertexPtxt[i] = xVertex[i];
+			}
+
+			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
+			helib::Ctxt tmpResult2(tmpResult);
+
+			tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt, 0));
+			tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt, 0));
+
+			// Move to left
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
+
+			// Move to right
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
+
+		} else if(nt == NodeType::y){
+
+			// Convert dy, dx, and dx*intercept to bin
+			int dx = startNode->getSegment()->getDx()
+			int dy = startNode->getSegment()->getDy()
+			int dxB =  dx * startNode->getSegment()->getIntercept();
+
+			// Compute dy*[x]+dx+b
+			// Compute dx*[y]
+
+			// Move to left
+			// findPrivatePoint(tmpResult = tmpLT)
+
+			// Move to right
+			// findPrivatePoint(tmpResult = tmpGT)
+
+		} else{
+			// Rotate result based on T_ID
+			// Accumulate in resultCtxt
+			// resultCtxt = resultCtxt OR tmpResult
+		}
+	} 
+}
+*/

@@ -4,94 +4,136 @@ PrivPointUtil::PrivPointUtil(){
 
 }
 
-std::vector<long> PrivPointUtil::encodePoint(int maxBits, std::vector<int> point, int nSlots){
+// std::vector<long> PrivPointUtil::encodePoint(int maxBits, std::vector<int> point, int nSlots){
+//   std::vector<long> pointBits(nSlots,0);
+  
+//   for(int i=0; i<maxBits; i++){
+//     pointBits[i] = long(point[0]/(pow(2,i)))%2;
+//     pointBits[i+maxBits] = long(point[1]/(pow(2,i)))%2; // y coordinate
+//   }
+
+//   return pointBits;
+// }
+
+std::vector<long> PrivPointUtil::encodePoint(int maxBits, int point, int nSlots){
   std::vector<long> pointBits(nSlots,0);
   
   for(int i=0; i<maxBits; i++){
-    pointBits[i] = long(point[0]/(pow(2,i)))%2;
-    pointBits[i+maxBits] = long(point[1]/(pow(2,i)))%2; // y coordinate
+    pointBits[i] = long(point/(pow(2,i)))%2;
   }
 
   return pointBits;
 }
 
-void PrivPointUtil::secureGT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
-    printf("--------Starting secureGT-------\n");
-    helib::Ptxt<helib::BGV> mask (*(encryptor.getContext()));
-    for(int i=0; i<maxBits; i++){
-        mask[i+maxBits*y] = 1;
-    }
-    // Compares if ctxt > ptxt
-    // Binary A > B --> A and not B
+helib::Ctxt PrivPointUtil::secureGT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b){
+    printf("--------Starting secureGT-------");
+    
     helib::Ptxt<helib::BGV> notOp (*(encryptor.getContext())); // plaintext vector set to ones for 'not' operation 
-    for(int i=0; i<nSlots; i++){
+    for(int i=0; i<maxBits; i++){
         notOp[i] = 1;
     }
-    a.multByConstant(mask);
-    b.multiplyBy(mask);
 
-    // encryptor.decryptAndPrintCondensed("pointCtxt", a, 2*maxBits);
+    // Equal to
+    helib::Ctxt eq(a); // eq = A
+    eq.addConstant(b); // eq = XOR(A,B)
+    eq.addConstant(notOp); // eq = XNOR(A,B)
+
+    // Compares if ctxt > ptxt
+    // Binary A > B --> A and not B
 
     b += notOp; // b now contains not B
     a.multByConstant(b); // a contains A and not B
-    // encryptor.decryptAndPrintCondensed("individual ctxt >= ptxt", a, 2*maxBits);
-    
     // Individual gt results are in each slot of a.
-    helib::Ctxt tmp = a;
-    tmp.addConstant(notOp); // not of results'
+    
+    // Assuming 4-bit example
+    // After getting bitwise results G <-- A and not B, E <-- A == B
+    // Whole result is R <-- G4 or E4G3 or E4E3G2 or E4E3E2G1
+    helib::Ctxt tmp(eq);
+
+    // Unused slots should = 1 in the tmp result, because rotation and mult by zero will effect result
+    // Consider as AND-ing with extra 1's (identity op)
+    for(int i=0; i<nSlots; i++){
+        if(i<maxBits){
+            notOp[i] = 0;
+        } else {
+            notOp[i] = 1;
+        }
+    }
+    tmp.addConstant(notOp);
 
     encryptor.getEncryptedArray()->rotate(tmp, -1);
-    // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
+
     for(int i=1; i<maxBits; i++){
         a.multiplyBy(tmp);
         encryptor.getEncryptedArray()->rotate(tmp, -1);
         // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
     }
     helib::totalSums(*encryptor.getEncryptedArray(), a);
-    encryptor.decryptAndPrintCondensed("ctxt > ptxt", a, maxBits);
-    printf("--------Done-------\n\n");
+    // encryptor.decryptAndPrintCondensed("ctxt > ptxt", a, maxBits);
+    printf("Done-------\n");
+    return a;
 }
 
-void PrivPointUtil::secureLT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
-    printf("--------Starting secureLT-------\n");
-    helib::Ptxt<helib::BGV> mask (*(encryptor.getContext()));
-
-    for(int i=0; i<maxBits; i++){
-        mask[i+maxBits*y] = 1;
-    }
-    // Compares if ctxt > ptxt
-    // Binary A > B --> A and not B
+helib::Ctxt PrivPointUtil::secureLT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b){
+    printf("--------Starting secureLT-------");
+    
     helib::Ptxt<helib::BGV> notOp (*(encryptor.getContext())); // plaintext vector set to ones for 'not' operation 
-    for(int i=0; i<nSlots; i++){
+    helib::Ptxt<helib::BGV> firstSlot (*(encryptor.getContext())); // filter out first slot only
+
+    firstSlot[0] = 1;
+    for(int i=0; i<maxBits; i++){
         notOp[i] = 1;
     }
-    a.multByConstant(mask);
-    b.multiplyBy(mask);
 
-    // encryptor.decryptAndPrintCondensed("pointCtxt", a, 2*maxBits);
+    // Compares if ctxt <= ptxt
+    // Binary A < B --> not A and B
+    // Binary A == B --> XNOR(A,B) = not XOR(A,B);
 
+    // Equal to
+    helib::Ctxt eq(a); // eq = A
+    eq.addConstant(b); // eq = XOR(A,B)
+    eq.addConstant(notOp); // eq = XNOR(A,B)
+
+    // Less Than
     a.addConstant(notOp); // a now contains not a
-    a.multByConstant(b); // a contains not A and B
-    // encryptor.decryptAndPrintCondensed("individual ctxt >= ptxt", a, 2*maxBits);
+    a.multByConstant(b); // a contains not A and B (Less Than)
+
+    // Individual LT results are in each slot of a, individual EQ results ar ein each slot of eq
+    helib::Ctxt tmp(eq);
     
-    // Individual gt results are in each slot of a.
-    helib::Ctxt tmp = a;
-    tmp.addConstant(notOp); // not of results'
+    // Unused slots should = 1 in the tmp result, because rotation and mult by zero will effect result
+    // Consider as AND-ing with extra 1's (identity op)
+    for(int i=0; i<nSlots; i++){
+        if(i<maxBits){
+            notOp[i] = 0;
+        } else {
+            notOp[i] = 1;
+        }
+    }
+    tmp.addConstant(notOp);
 
     encryptor.getEncryptedArray()->rotate(tmp, -1);
-    // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
-    for(int i=1; i<maxBits; i++){
+
+    // For a 4-bit example
+    // Given bitwise results L <-- A < B, E <-- A == B
+    // Final result R <-- A <= B <-- L4 or E4L3 or E4E3L2 or E4E3E2L1 or E4E3E2E1 
+    for(int i=1; i<maxBits-1; i++){
         a.multiplyBy(tmp);
+        eq.multiplyBy(tmp);
         encryptor.getEncryptedArray()->rotate(tmp, -1);
         // encryptor.decryptAndPrintCondensed("tmp", tmp, 2*maxBits);
-    }
-    helib::totalSums(*encryptor.getEncryptedArray(), a);
-    encryptor.decryptAndPrintCondensed("ctxt < ptxt", a, maxBits);
-    printf("--------Done-------\n\n");
+    } // Now has L4 or E4L3 or E4E3L2 or E4E3E2L1 at each slot
+    eq.multByConstant(firstSlot); // Add in the case where the two are equal (E4E3E2E1)
+    a += eq; // slots are (E4E3E2L1 or E4E3E2E1), E4E3L2, E4L3, L4
+    helib::totalSums(*encryptor.getEncryptedArray(), a); // sum all results
+
+    // encryptor.decryptAndPrintCondensed("ctxt < ptxt", a, maxBits);
+    printf("Done-------\n");
+    return a;
 }
 
-void PrivPointUtil::binaryMult(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
-    printf("--------Starting binaryMult-------\n");
+helib::Ctxt PrivPointUtil::binaryMult(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
+    printf("--------Starting binaryMult-------");
 
     helib::Ptxt<helib::BGV> pointMask (*(encryptor.getContext()));
     helib::Ptxt<helib::BGV> zeros (*(encryptor.getContext()));
@@ -154,8 +196,8 @@ void PrivPointUtil::binaryMult(Encryptor &encryptor, int maxBits, int nSlots, he
     // Add final Carry
     binaryProd += carry;
 
-    printf("\n");
-
-    encryptor.decryptAndPrintCondensed("FINAL: binaryProd", binaryProd, 2*maxBits);
-    printf("--------Done-------\n\n");
+    // printf("\n");
+    // encryptor.decryptAndPrintCondensed("FINAL: binaryProd", binaryProd, 2*maxBits);
+    printf("Done-------\n");
+    return binaryProd;
 }

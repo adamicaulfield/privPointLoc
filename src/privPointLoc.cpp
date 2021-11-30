@@ -13,8 +13,8 @@
 
 int main(int argc, char **argv) {
     PrivPointUtil * privUtil = new PrivPointUtil();
-
-    if (argc<2){
+    int mode = atoi(argv[1]);
+    if (mode==0){
         printf("-------------------- START MAIN -------------------- \n");
         
         Tree * tree = new Tree();
@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
         tree->initAdjacencyMatrix();
         tree->writeAdjacencyMatrix(tree->getRoot());
         tree->wrireSumsAdjacencyMatrix();
-        // tree->printAdjacencyMatrix();
-        tree->writeAdjacencyMatrixToFile("data/adjMatrix.csv");
+        tree->printAdjacencyMatrix();
+        // tree->writeAdjacencyMatrixToFile("data/adjMatrix.csv");
 
         // printf("---- PHASE 3: Enter a Point in the form \"x y\" to discover which trapezoid it is located in: \n");
         // std::string pointStr;
@@ -62,42 +62,46 @@ int main(int argc, char **argv) {
         unsigned long numOfColOfKeySwitchingMatrix = 2;  
         
         printf("------ Initialize Encryptor Object ------\n");
-        Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus,phiM,lifting,numOfBitsOfModulusChain,numOfColOfKeySwitchingMatrix);
+        Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
         printf("------ Done ------\n\n");
         int nSlots = encryptor.getEncryptedArray()->size();
-        // std::cout << "Slot count: " << nSlots << std::endl;
+        std::cout << "Slot count: " << nSlots << std::endl;
 
         int totalPoints = 3;
 
         int maxBits = 4;
 
-        std::vector<int> point = {5,11};
+        int point = atoi(argv[2]);
+        int regionVertex = atoi(argv[3]);
+
         std::vector<long> pointBits = privUtil->encodePoint(maxBits, point, nSlots);
         helib::Ctxt pointCtxt (*(encryptor.getPublicKey()));
         encryptor.getEncryptedArray()->encrypt(pointCtxt, *(encryptor.getPublicKey()), pointBits);
 
-        std::vector<int> regionVertex = {10,10};
         std::vector<long> regionVertexBits = privUtil->encodePoint(maxBits, regionVertex, nSlots);
 
-        printf("point(%d,%d) in bits: ",point[0],point[1]);
+        printf("x=%d in bits: ", point);
         for(int i=0; i<maxBits*2; i++){
             std::cout << pointBits[i] << " "; 
         }    
         std::cout << std::endl;
 
         helib::Ptxt<helib::BGV> regionVertextPtxt (*(encryptor.getContext())); 
-        printf("Region Vertex(%d,%d) in bits: ", regionVertex[0], regionVertex[1]);
+        printf("Vertex=%d in bits: ", regionVertex);
         for(int i=0; i<2*maxBits; i++){
             regionVertextPtxt[i] = regionVertexBits[i];
             std::cout << regionVertexBits[i] << " "; 
         }
         std::cout << "\n" << std::endl;
 
-        privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 0);
+        helib::Ctxt result = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 0);
+        encryptor.decryptAndPrintCondensed("FINAL: prod", result, 2*maxBits);
 
-        printf("Compare by y coordinate:\n");
-        privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
+        printf("COMPARE A=%d and B=%d\n", point, regionVertex);
+        result = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt);
+        encryptor.decryptAndPrintCondensed("A>B", result, 2*maxBits);
 
-        privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 1);
+        result = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt);
+        encryptor.decryptAndPrintCondensed("A<=B", result, 2*maxBits);
     }   
 }
