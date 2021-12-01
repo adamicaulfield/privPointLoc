@@ -13,7 +13,10 @@ public:
     std::vector<long> encodePoint(int, int, int);
     helib::Ctxt secureLT(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>);
     helib::Ctxt secureGT(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>);
+    helib::Ctxt secureLT(Encryptor &, int, int, helib::Ctxt, helib::Ctxt);
+    helib::Ctxt secureGT(Encryptor &, int, int, helib::Ctxt, helib::Ctxt);
     helib::Ctxt binaryMult(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>, int);
+    helib::Ctxt binaryAdd(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>);
 };
 
 #endif /*PRIVPOINTLOC_PRIVPOINTUTIL_H*/

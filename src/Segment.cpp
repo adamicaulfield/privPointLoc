@@ -72,5 +72,5 @@ int Segment::getDx(){
 }
 
 int Segment::getDy(){
-	
+	return dy;
 }

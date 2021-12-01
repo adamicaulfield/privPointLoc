@@ -10,6 +10,7 @@
 #include "Segment.h"
 #include <stdlib.h>     /* atoi */
 #include "PrivPointUtil.h"
+#include <chrono>
 
 int main(int argc, char **argv) {
     PrivPointUtil * privUtil = new PrivPointUtil();
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
         tree->initAdjacencyMatrix();
         tree->writeAdjacencyMatrix(tree->getRoot());
         tree->wrireSumsAdjacencyMatrix();
-        tree->printAdjacencyMatrix();
+        // tree->printAdjacencyMatrix();
         // tree->writeAdjacencyMatrixToFile("data/adjMatrix.csv");
 
         // printf("---- PHASE 3: Enter a Point in the form \"x y\" to discover which trapezoid it is located in: \n");
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
         // printf("\nFINDING POINT: (%d,%d)\n", x,y);
         // tree->findPoint(x,y, tree->getRoot());
     } 
-    else{
+    else if(mode == 1){
         unsigned long plaintext_prime_modulus = 2;
         unsigned long phiM = 21845;
         unsigned long lifting = 1;
@@ -66,8 +67,6 @@ int main(int argc, char **argv) {
         printf("------ Done ------\n\n");
         int nSlots = encryptor.getEncryptedArray()->size();
         std::cout << "Slot count: " << nSlots << std::endl;
-
-        int totalPoints = 3;
 
         int maxBits = 4;
 
@@ -103,5 +102,78 @@ int main(int argc, char **argv) {
 
         result = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt);
         encryptor.decryptAndPrintCondensed("A<=B", result, 2*maxBits);
-    }   
+    } else if(mode==2){
+        printf("-------------------- START MAIN -------------------- \n");
+        
+        Tree * tree = new Tree();
+
+        printf("----- PHASE 1: Read from file, insert into Tree/DAG -----\n");
+        tree->readSegmentsFile("data/ac7717.txt");
+        
+        printf("----- Print Tree/DAG after read file and insert segments -----\n");
+        tree->printTree(tree->getRoot());
+
+        printf("------ Initialize Encryptor Object ------\n");
+        unsigned long plaintext_prime_modulus = 2;
+        unsigned long phiM = 21845;
+        unsigned long lifting = 1;
+        unsigned long numOfBitsOfModulusChain = 1024;
+        unsigned long numOfColOfKeySwitchingMatrix = 2;  
+    
+        Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
+        
+        int nSlots = encryptor.getEncryptedArray()->size();
+        std::cout << "Slot count: " << nSlots << std::endl;
+        printf("------ Done ------\n\n");
+
+        int maxBits = 4;
+        int xCoord = atoi(argv[2]);
+        int yCoord = atoi(argv[3]);
+
+        std::vector<long> xPointBits = privUtil->encodePoint(maxBits, xCoord, nSlots);
+        std::vector<long> yPointBits = privUtil->encodePoint(maxBits, yCoord, nSlots);
+
+        std::vector<long> pointBits(nSlots);
+        std::vector<long> ones(nSlots);
+        for(int i=0; i<maxBits; i++){
+            
+            pointBits[i] = xPointBits[i];
+            pointBits[i+maxBits] = yPointBits[i];    
+            
+            ones[i] = 1;
+        }
+
+        printf("LOCATE PRIVATE POINT\n");
+        // for(int i=0; i<maxBits*2; i++){
+        //     std::cout << pointBits[i] << " "; 
+        // }    
+        // std::cout << std::endl;
+        printf("---- User side ---- \n");
+
+        helib::Ctxt pointCtxt (*(encryptor.getPublicKey()));
+        helib::Ctxt tmpResult(*(encryptor.getPublicKey()));
+        helib::Ctxt resultCtxt(*(encryptor.getPublicKey()));
+
+        printf("\tEncrypting point.... ");
+        encryptor.getEncryptedArray()->encrypt(pointCtxt, *(encryptor.getPublicKey()), pointBits);
+        encryptor.getEncryptedArray()->encrypt(tmpResult, *(encryptor.getPublicKey()), ones);
+        printf(" Done\n");
+        // encryptor.decryptAndPrintCondensed("init tmpResult", tmpResult, maxBits);
+        // encryptor.getEncryptedArray()->encrypt(resultCtxt, *(encryptor.getPublicKey()), ones);
+        printf("\tSending to Cloud for Planar Point Location\n");
+
+        printf("---- Cloud Side ---- \n");
+        printf("\tBeginning location....\n");
+        auto start = std::chrono::high_resolution_clock::now();
+        tree->findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, tree->getRoot(), maxBits, nSlots);
+        auto stop = std::chrono::high_resolution_clock::now();            
+        printf("\tComplete. Sending back to user ....\n");
+
+        printf("---- User Side ---- \n");
+        printf("\tReceiving ciphertext form cloud. Decrypting: \n");
+        printf("\t");
+        encryptor.decryptAndPrintCondensed("Result", resultCtxt, 4);
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+        printf("\tSeconds to find point: %0.2f\n", duration.count()/1000.0);
+    }
 }

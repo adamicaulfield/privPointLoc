@@ -114,11 +114,11 @@ void Tree::insert(Segment * s){
 				case NodeType::x:
 					value = searchNode->getValue();
 					if(xl <= searchNode->getValue()){
-						printf("\tX: %d <= %d-->\n", xl, value);
+						// printf("\tX: %d <= %d-->\n", xl, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
-						printf("\tX: %d > %d-->\n", xl, value);
+						// printf("\tX: %d > %d-->\n", xl, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -127,11 +127,11 @@ void Tree::insert(Segment * s){
 				case NodeType::y:
 					value = searchNode->getSegment()->getYonSeg(xl);
 					if(yl <= searchNode->getSegment()->getYonSeg(xl)){
-						printf("\tY: %d <= %d-->\n", yl, value);
+						// printf("\tY: %d <= %d-->\n", yl, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
-						printf("\tY: %d > %d-->\n", yl, value);
+						// printf("\tY: %d > %d-->\n", yl, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -165,11 +165,11 @@ void Tree::insert(Segment * s){
 				case NodeType::x:
 					value = searchNode->getValue();
 					if(xr <= searchNode->getValue()){
-						printf("\tX: %d <= %d-->\n", xr, value);
+						// printf("\tX: %d <= %d-->\n", xr, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
-						printf("\tX: %d > %d-->\n", xr, value);
+						// printf("\tX: %d > %d-->\n", xr, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -178,11 +178,11 @@ void Tree::insert(Segment * s){
 				case NodeType::y:
 					value = searchNode->getSegment()->getYonSeg(xr);
 					if(yr <= searchNode->getSegment()->getYonSeg(xr)){
-						printf("\tY: %d <= %d-->\n", yr, value);
+						// printf("\tY: %d <= %d-->\n", yr, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
-						printf("\tY: %d > %d-->\n", yr, value);
+						// printf("\tY: %d > %d-->\n", yr, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -306,7 +306,6 @@ void Tree::printTree(Node * startNode, int depth){
 		printTree(startNode->getLeft(), depth+1);
 	}
 }
-
 
 // Functions to convert tree into adjacency matrix, and write to file
 void Tree::setupLists(Node * startNode){
@@ -504,52 +503,126 @@ void Tree::findPoint(int x, int y, Node * startNode){
 	}
 }
 
-/*
+
 void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
 	if(startNode != nullptr){
 		NodeType nt = startNode->getNodeType();
 		if(nt == NodeType::x){
-
+			printf("\t Checking X-Node\n");
 			// Convert vectex X Point to bin
 			std::vector<long> xVertex = privUtil->encodePoint(maxBits, startNode->getValue(), nSlots);
 			helib::Ptxt<helib::BGV> xVertexPtxt (*(encryptor.getContext()));
-			for(int i=0; i<2*maxbits; i++){
+			// printf("xVertex Bits: ");
+			for(int i=0; i<2*maxBits; i++){
 				xVertexPtxt[i] = xVertex[i];
+				// printf("%ld ", xVertex[i]);
 			}
+			// printf("\n");
 
 			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
 			helib::Ctxt tmpResult2(tmpResult);
 
-			tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt, 0));
-			tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt, 0));
+			helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+			// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, 4);
+			tmpResult.multiplyBy(ltCtxt);
+			// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, 4);
+			helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+			// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, 4);
+			tmpResult2.multiplyBy(gtCtxt);
+			// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", tmpResult2, 4);
 
 			// Move to left
-			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
+			// printf("\t Checking Left\n");
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
 
 			// Move to right
-			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
+			// printf("\t Checking Right\n");
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
 
 		} else if(nt == NodeType::y){
-
+			printf("\t Checking Y-Node\n");
 			// Convert dy, dx, and dx*intercept to bin
-			int dx = startNode->getSegment()->getDx()
-			int dy = startNode->getSegment()->getDy()
-			int dxB =  dx * startNode->getSegment()->getIntercept();
+			int dx = startNode->getSegment()->getDx();
+			int dy = startNode->getSegment()->getDy();
+			int dxb =  dx * startNode->getSegment()->getIntercept();
 
-			// Compute dy*[x]+dx+b
+			std::vector<long> dxBits = privUtil->encodePoint(maxBits, dx, nSlots);
+			std::vector<long> dyBits = privUtil->encodePoint(maxBits, dy, nSlots);
+			std::vector<long> dxbBits = privUtil->encodePoint(maxBits, dxb, nSlots);
+
+			helib::Ptxt<helib::BGV> dxPtxt (*(encryptor.getContext())); 
+			helib::Ptxt<helib::BGV> dyPtxt (*(encryptor.getContext())); 
+			helib::Ptxt<helib::BGV> dxbPtxt (*(encryptor.getContext())); 
+			for(int i=0; i<maxBits; i++){
+			    dxPtxt[i] = dxBits[i];
+			    dyPtxt[i] = dyBits[i];
+			    dxbPtxt[i] = dxbBits[i];
+			}			
+
+			// printf("dxPtxt (%d): ", dx);
+			// for(int i=0; i<maxBits; i++){
+			//     printf("%ld ", dxBits[i]);
+			// }
+			// printf("\n");	
+
+			// printf("dyPtxt: (%d)", dy);
+			// for(int i=0; i<maxBits; i++){
+			//     printf("%ld ", dyBits[i]);
+			// }
+			// printf("\n");	
+
+			// printf("dxbPtxt: (%d)", dxb);
+			// for(int i=0; i<maxBits; i++){
+			//     printf("%ld ", dxbBits[i]);
+			// }
+			// printf("\n");	
+
+
+			// Compute dy*[x]+dxb
+			helib::Ctxt dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
+			// encryptor.decryptAndPrintCondensed("dyx", dyx, 4);
+
 			// Compute dx*[y]
+			helib::Ctxt dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
+			// encryptor.decryptAndPrintCondensed("dxy", dxy, 4);
 
+			// Move to left if dx[y] <= (c1=dy[x]+dxb)
+			helib::Ctxt c1 = privUtil->binaryAdd(encryptor, maxBits, nSlots, dyx, dxbPtxt);
+			// encryptor.decryptAndPrintCondensed("c1", c1, 4);
+
+			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
+			helib::Ctxt tmpResult2(tmpResult);
+
+			tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
+			// encryptor.decryptAndPrintCondensed("pointCtxt <= yVertex", tmpResult, 4);
+			tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));
+			// encryptor.decryptAndPrintCondensed("pointCtxt > yVertex", tmpResult, 4);
+
+			// printf("\t Checking Left\n");
 			// Move to left
-			// findPrivatePoint(tmpResult = tmpLT)
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
 
+			// printf("\t Checking Right\n");
 			// Move to right
-			// findPrivatePoint(tmpResult = tmpGT)
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
 
-		} else{
-			// Rotate result based on T_ID
-			// Accumulate in resultCtxt
-			// resultCtxt = resultCtxt OR tmpResult
+		} else{ // Leaf Node
+			// Mask result based on T_ID
+			int tID = startNode->getValue();
+			// printf("\tGot to TID=%d\n", tID);
+			// encryptor.decryptAndPrintCondensed("tmpResult", tmpResult, 4);
+			helib::Ptxt<helib::BGV> mask (*(encryptor.getContext())); 
+			mask[tID] = 1;
+			tmpResult.multByConstant(mask);
+			
+			// resultCtxt = resultCtxt OR tmpResult = xor(r,t) + and(r,t)
+			helib::Ctxt andCtxt(tmpResult); //and
+			andCtxt.multiplyBy(resultCtxt);
+
+			resultCtxt += tmpResult;	//xor
+			resultCtxt += andCtxt;		//xor + and
+			// printf("\t Accumulated result\n");
+
 		}
 	} 
 }
-*/

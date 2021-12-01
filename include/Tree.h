@@ -9,6 +9,8 @@
 
 #include "Node.h"
 #include "Segment.h"
+#include "Encryptor.h"
+#include "PrivPointUtil.h"
 
 // handle cyclic dependencies
 class Node; 
@@ -31,6 +33,7 @@ public:
     void printAdjacencyMatrix();
     void writeAdjacencyMatrixToFile(std::string);
     void findPoint(int, int, Node *);
+    void findPrivatePoint(Encryptor &, PrivPointUtil *, helib::Ctxt , helib::Ctxt &, helib::Ctxt, Node *, int, int);
 private:
     Node * root;
     int size; //total nodes
