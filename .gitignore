@@ -6,3 +6,4 @@ cmake*
 Makefile
 /tmp/
 /data/.csv
+src/CMakeFiles/
