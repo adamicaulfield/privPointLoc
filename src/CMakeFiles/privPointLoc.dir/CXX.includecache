@@ -6,11 +6,25 @@
 
 #IncludeRegexTransform: 
 
-/home/adamc/Documents/privPointLoc/src/PrivPointUtil.cpp
+/home/adamc/Documents/privPointLoc/src/privPointLoc.cpp
+Encryptor.h
+/home/adamc/Documents/privPointLoc/src/Encryptor.h
+iostream
+-
+fstream
+-
+math.h
+-
+Tree.h
+/home/adamc/Documents/privPointLoc/src/Tree.h
+Node.h
+/home/adamc/Documents/privPointLoc/src/Node.h
+Segment.h
+/home/adamc/Documents/privPointLoc/src/Segment.h
+stdlib.h
+-
 PrivPointUtil.h
 /home/adamc/Documents/privPointLoc/src/PrivPointUtil.h
-cmath
--
 chrono
 -
 
@@ -772,7 +786,41 @@ include/Encryptor.h
 helib/helib.h
 -
 
+include/Node.h
+iostream
+-
+fstream
+-
+string
+-
+Tree.h
+include/Tree.h
+
 include/PrivPointUtil.h
 Encryptor.h
 include/Encryptor.h
+
+include/Segment.h
+iostream
+-
+fstream
+-
+vector
+-
+Node.h
+include/Node.h
+
+include/Tree.h
+iostream
+-
+fstream
+-
+Node.h
+include/Node.h
+Segment.h
+include/Segment.h
+Encryptor.h
+include/Encryptor.h
+PrivPointUtil.h
+include/PrivPointUtil.h
 

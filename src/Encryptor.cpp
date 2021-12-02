@@ -64,7 +64,14 @@ Encryptor::Encryptor(const std::string &secret_key_file_path, const std::string 
     pk_fs.close_output_stream();
 }
 
-Encryptor::Encryptor(const std::string &private_key_file_path, const std::string &public_key_file_path, long plaintextModulus, long lifting, long numOfBitsOfModulusChain, long numOfColOfKeySwitchingMatrix, long desiredSlotCount, long securityLevel)
+Encryptor::Encryptor(const std::string &private_key_file_path, 
+                     const std::string &public_key_file_path, 
+                     long plaintextModulus, 
+                     long lifting, 
+                     long numOfBitsOfModulusChain, 
+                     long numOfColOfKeySwitchingMatrix, 
+                     long desiredSlotCount, 
+                     long securityLevel)
         : plaintextModulus(plaintextModulus), lifting(lifting), numOfBitsOfModulusChain(numOfBitsOfModulusChain),
           numOfColOfKeySwitchingMatrix(numOfColOfKeySwitchingMatrix), desiredSlotCount(desiredSlotCount), securityLevel(securityLevel) {
     /**
@@ -187,6 +194,7 @@ Encryptor::decryptAndPrint(const std::string &msg, const helib::Ctxt &ctxt) {
     std::cout << "Decrypt(" << msg << "): " << dec_ptxt << std::endl;
 }
 
+// By Adam Caulfield
 void
 Encryptor::decryptAndPrintCondensed(const std::string &msg, const helib::Ctxt &ctxt, int size){
     std::vector<long> dec_ptxt(this->getEncryptedArray()->size());

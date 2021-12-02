@@ -47,7 +47,12 @@ void Segment::initDual(){
 		slope = double(dy) / double(dx);
 	}
 
-	intercept = int(double(leftEndpoint[1])-slope*double(leftEndpoint[0])+0.5f);
+	double tmp = double(leftEndpoint[1])-slope*double(leftEndpoint[0]);
+	if(std::fmod(tmp,1)>=0.5){
+		intercept = int(tmp+0.5f);
+	} else{
+		intercept = int(tmp);
+	}
 }
 
 int Segment::getYonSeg(int x){

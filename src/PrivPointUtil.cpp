@@ -3,19 +3,7 @@
 #include <chrono>
 
 PrivPointUtil::PrivPointUtil(){
-
 }
-
-// std::vector<long> PrivPointUtil::encodePoint(int maxBits, std::vector<int> point, int nSlots){
-//   std::vector<long> pointBits(nSlots,0);
-  
-//   for(int i=0; i<maxBits; i++){
-//     pointBits[i] = long(point[0]/(pow(2,i)))%2;
-//     pointBits[i+maxBits] = long(point[1]/(pow(2,i)))%2; // y coordinate
-//   }
-
-//   return pointBits;
-// }
 
 std::vector<long> PrivPointUtil::encodePoint(int maxBits, int p, int nSlots){
     bool negative = (p < 0);

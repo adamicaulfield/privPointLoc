@@ -51,6 +51,10 @@ int Tree::getTreeSize(){
 	return size;
 }
 
+int Tree::getTotalTrapezoids(){
+	return totalTrapezoids;
+}
+
 void Tree::insert(Segment * s){
 	printf("beginning insert()....\n");
 
@@ -523,13 +527,13 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 			helib::Ctxt tmpResult2(tmpResult);
 
 			helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
-			// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, 4);
+			// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
 			tmpResult.multiplyBy(ltCtxt);
-			// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, 4);
+			// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
 			helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
-			// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, 4);
+			// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, maxBits);
 			tmpResult2.multiplyBy(gtCtxt);
-			// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", tmpResult2, 4);
+			// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", tmpResult2, maxBits);
 
 			// Move to left
 			// printf("\t Checking Left\n");
@@ -580,23 +584,26 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 
 			// Compute dy*[x]+dxb
 			helib::Ctxt dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
-			// encryptor.decryptAndPrintCondensed("dyx", dyx, 4);
+			// printf("\t");
+			// encryptor.decryptAndPrintCondensed("dyx", dyx, maxBits);
 
 			// Compute dx*[y]
 			helib::Ctxt dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
-			// encryptor.decryptAndPrintCondensed("dxy", dxy, 4);
+			// printf("\t");
+			// encryptor.decryptAndPrintCondensed("dxy", dxy, maxBits);
 
 			// Move to left if dx[y] <= (c1=dy[x]+dxb)
 			helib::Ctxt c1 = privUtil->binaryAdd(encryptor, maxBits, nSlots, dyx, dxbPtxt);
-			// encryptor.decryptAndPrintCondensed("c1", c1, 4);
+			// printf("\t");
+			// encryptor.decryptAndPrintCondensed("c1", c1, maxBits);
 
 			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
 			helib::Ctxt tmpResult2(tmpResult);
 
 			tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
-			// encryptor.decryptAndPrintCondensed("pointCtxt <= yVertex", tmpResult, 4);
+			// encryptor.decryptAndPrintCondensed("pointCtxt <= yVertex", tmpResult, maxBits);
 			tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));
-			// encryptor.decryptAndPrintCondensed("pointCtxt > yVertex", tmpResult, 4);
+			// encryptor.decryptAndPrintCondensed("pointCtxt > yVertex", tmpResult, maxBits);
 
 			// printf("\t Checking Left\n");
 			// Move to left
@@ -610,7 +617,7 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 			// Mask result based on T_ID
 			int tID = startNode->getValue();
 			// printf("\tGot to TID=%d\n", tID);
-			// encryptor.decryptAndPrintCondensed("tmpResult", tmpResult, 4);
+			// encryptor.decryptAndPrintCondensed("tmpResult", tmpResult, maxBits);
 			helib::Ptxt<helib::BGV> mask (*(encryptor.getContext())); 
 			mask[tID] = 1;
 			tmpResult.multByConstant(mask);

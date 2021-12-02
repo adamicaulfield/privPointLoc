@@ -103,32 +103,43 @@ int main(int argc, char **argv) {
         result = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt);
         encryptor.decryptAndPrintCondensed("A<=B", result, 2*maxBits);
     } else if(mode==2){
-        printf("-------------------- START MAIN -------------------- \n");
+        printf("-------------------- DEFAULT VERSION -------------------- \n");
         
+        int maxBits = atoi(argv[2]);
+        int xCoord = atoi(argv[3]);
+        int yCoord = atoi(argv[4]);
+
         Tree * tree = new Tree();
 
-        printf("----- PHASE 1: Read from file, insert into Tree/DAG -----\n");
+        printf("----- Read from file, insert into Tree/DAG -----\n");
         tree->readSegmentsFile("data/ac7717.txt");
         
         printf("----- Print Tree/DAG after read file and insert segments -----\n");
         tree->printTree(tree->getRoot());
 
+        printf("----- Write Adjacency Matrix -----\n");
+        tree->setupLists(tree->getRoot());
+        tree->initAdjacencyMatrix();
+        tree->writeAdjacencyMatrix(tree->getRoot());
+        tree->wrireSumsAdjacencyMatrix();
+
+        printf("----  Enter a Point in the form \"x y\" to discover which trapezoid it is located in: \n");
+        printf("\nFINDING POINT: (%d,%d)\n", xCoord,yCoord);
+        tree->findPoint(xCoord, yCoord, tree->getRoot());
+
+        printf("-------------------- ENCRYPTED VERSION -------------------- \n");
         printf("------ Initialize Encryptor Object ------\n");
         unsigned long plaintext_prime_modulus = 2;
         unsigned long phiM = 21845;
         unsigned long lifting = 1;
-        unsigned long numOfBitsOfModulusChain = 1024;
+        unsigned long numOfBitsOfModulusChain = 512+256;
         unsigned long numOfColOfKeySwitchingMatrix = 2;  
-    
+        
         Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
         
         int nSlots = encryptor.getEncryptedArray()->size();
         std::cout << "Slot count: " << nSlots << std::endl;
         printf("------ Done ------\n\n");
-
-        int maxBits = 4;
-        int xCoord = atoi(argv[2]);
-        int yCoord = atoi(argv[3]);
 
         std::vector<long> xPointBits = privUtil->encodePoint(maxBits, xCoord, nSlots);
         std::vector<long> yPointBits = privUtil->encodePoint(maxBits, yCoord, nSlots);
@@ -143,7 +154,7 @@ int main(int argc, char **argv) {
             ones[i] = 1;
         }
 
-        printf("LOCATE PRIVATE POINT\n");
+        printf("LOCATE PRIVATE POINT (%d, %d)\n", xCoord, yCoord);
         // for(int i=0; i<maxBits*2; i++){
         //     std::cout << pointBits[i] << " "; 
         // }    
@@ -172,7 +183,7 @@ int main(int argc, char **argv) {
         printf("---- User Side ---- \n");
         printf("\tReceiving ciphertext form cloud. Decrypting: \n");
         printf("\t");
-        encryptor.decryptAndPrintCondensed("Result", resultCtxt, 4);
+        encryptor.decryptAndPrintCondensed("Result", resultCtxt, tree->getTotalTrapezoids()+1);
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
         printf("\tSeconds to find point: %0.2f\n", duration.count()/1000.0);
     }

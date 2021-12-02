@@ -22,6 +22,7 @@ public:
     void readSegmentsFile(std::string);
     Node * getRoot();
     int getTreeSize();
+    int getTotalTrapezoids();
     void insert(Segment *);
     void printTree(Node *, int = 0);
     void addLeafNodes(Node *);
