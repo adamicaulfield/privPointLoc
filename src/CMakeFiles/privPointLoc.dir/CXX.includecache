@@ -6,6 +6,34 @@
 
 #IncludeRegexTransform: 
 
+/home/adamc/Documents/privPointLoc/src/Node.cpp
+Node.h
+/home/adamc/Documents/privPointLoc/src/Node.h
+
+/home/adamc/Documents/privPointLoc/src/Segment.cpp
+Segment.h
+/home/adamc/Documents/privPointLoc/src/Segment.h
+Node.h
+/home/adamc/Documents/privPointLoc/src/Node.h
+
+/home/adamc/Documents/privPointLoc/src/Tree.cpp
+Tree.h
+/home/adamc/Documents/privPointLoc/src/Tree.h
+Node.h
+/home/adamc/Documents/privPointLoc/src/Node.h
+cmath
+-
+string
+-
+stdlib.h
+-
+iostream
+-
+fstream
+-
+sstream
+-
+
 /home/adamc/Documents/privPointLoc/src/privPointLoc.cpp
 Encryptor.h
 /home/adamc/Documents/privPointLoc/src/Encryptor.h
@@ -795,6 +823,8 @@ string
 -
 Tree.h
 include/Tree.h
+vector
+-
 
 include/PrivPointUtil.h
 Encryptor.h

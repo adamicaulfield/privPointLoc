@@ -16,33 +16,7 @@ Tree::Tree(){
 	totalTrapezoids = 0;
 }
 
-// Process Input file, feed segments into tree
-void Tree::readSegmentsFile(std::string filename){
-	std::ifstream segFile(filename);
-	std::string line;
-	std::string delim = " ";
-	std::string coord;
-	int lineNum = 0;
-	int xl, yl, xr, yr;
-	if(segFile.is_open()){
-		while(getline(segFile, line)){
-			if(lineNum >= 2){
-				std::stringstream ss;
-				ss << line;
-				ss >> xl >> yl >> xr >> yr;
-				printf("ADDING SEGMENT: (%d, %d)-(%d, %d)\n", xl, yl, xr, yr);
-				insert(new Segment(xl, yl, xr, yr));
-			}
-			lineNum++;
-		}
-		segFile.close();
-	}
-	else{
-		std::cout << "Could not open file" << std::endl;
-	}
-}
-
-// TREE / DAG FUNCTIONS
+/*********** Getters ***********/
 Node * Tree::getRoot(){
 	return root;
 }
@@ -55,6 +29,7 @@ int Tree::getTotalTrapezoids(){
 	return totalTrapezoids;
 }
 
+/*********** Tree/DAG Setup functions ***********/
 void Tree::insert(Segment * s){
 	printf("beginning insert()....\n");
 
@@ -280,6 +255,35 @@ void Tree::deleteLeafNodes(Node * node){
 	}
 }
 
+/*********** UTILITY FUNCTIONS ***********/
+
+// Process Input file, feed segments into tree
+void Tree::readSegmentsFile(std::string filename){
+	std::ifstream segFile(filename);
+	std::string line;
+	std::string delim = " ";
+	std::string coord;
+	int lineNum = 0;
+	int xl, yl, xr, yr;
+	if(segFile.is_open()){
+		while(getline(segFile, line)){
+			if(lineNum >= 2){
+				std::stringstream ss;
+				ss << line;
+				ss >> xl >> yl >> xr >> yr;
+				printf("ADDING SEGMENT: (%d, %d)-(%d, %d)\n", xl, yl, xr, yr);
+				insert(new Segment(xl, yl, xr, yr));
+			}
+			lineNum++;
+		}
+		segFile.close();
+	}
+	else{
+		std::cout << "Could not open file" << std::endl;
+	}
+}
+
+// Prints trees
 void Tree::printTree(Node * startNode, int depth){
 	depth++;
 	switch(startNode->getNodeType()){
@@ -311,7 +315,48 @@ void Tree::printTree(Node * startNode, int depth){
 	}
 }
 
-// Functions to convert tree into adjacency matrix, and write to file
+// Resets tree labels to be continuous
+void Tree::cleanTree(Node * startNode){
+	setupLists(startNode);
+	totalTrapezoids = tList.size();
+	for(int i=0; i<totalTrapezoids; i++){
+		tList[i]->setValue(i);
+	}
+}
+
+// Prints path labels for each leaf node, assumes call to setupLists() already occurred.
+void Tree::printPathLabels(){
+	std::cout << "Path Labels for each Trapezoid (Leaf)" << std::endl;
+	for(int i=0; i<tList.size(); i++){
+		std::cout << tList[i]->getMatrixLabel() << ": ";
+		std::vector<std::string> pathLabels = tList[i]->getPathLabels();
+		for(int j=0; j<pathLabels.size(); j++){
+			std::cout << pathLabels[j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+
+// Setup path labels as a string represeting right(1) and left(1) turns starting from root. EX: string "001" means left-left-right
+void Tree::setupPathLabels(Node * startNode, std::string label){
+	if(startNode != nullptr){
+		NodeType nt = startNode->getNodeType();
+		if(nt == NodeType::leaf){
+			startNode->addPathLabel(label);
+		} else{
+			// Traverse Left
+			setupPathLabels(startNode->getLeft(), label+"0");
+
+			// Traverse Right
+			setupPathLabels(startNode->getRight(), label+"1");
+		}
+	} else {
+		return;
+	}
+}
+
+/*********** ADJACENCY MATRIX FUNCTIONS ***********/
 void Tree::setupLists(Node * startNode){
 	if(startNode != nullptr){
 		NodeType nt = startNode->getNodeType();
@@ -478,8 +523,9 @@ void Tree::writeAdjacencyMatrixToFile(std::string filename){
 	std::cout << "SUCCESS: Wrote Adjacency matrix to: \'" << filename << "\'" << std::endl;
 }
 
-// PLANAR POINT LOCATION
+/*********** POINT LOCATION ***********/
 
+// Plaintext
 void Tree::findPoint(int x, int y, Node * startNode){
 	if(startNode != nullptr){
 		std::cout << startNode->getMatrixLabel(); 
@@ -507,7 +553,7 @@ void Tree::findPoint(int x, int y, Node * startNode){
 	}
 }
 
-
+// Encrypted
 void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
 	if(startNode != nullptr){
 		NodeType nt = startNode->getNodeType();

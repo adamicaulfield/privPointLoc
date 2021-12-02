@@ -9,8 +9,6 @@ Node::Node(Tree * t, Segment * seg, NodeType ty){
 	s = seg;
 	tree = t;
 	type = ty;
-	leftCount = 0;
-	rightCount = 0;
 }
 
 void Node::setValue(int v){
@@ -77,4 +75,13 @@ int Node::getMatrixIndex(){
 
 std::string Node::getMatrixLabel(){
 	return matrixLabel;
+}
+
+
+void Node::addPathLabel(std::string s){
+	pathLabels.push_back(s);
+}
+
+std::vector<std::string> Node::getPathLabels(){
+	return pathLabels;
 }

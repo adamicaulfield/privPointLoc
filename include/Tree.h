@@ -35,6 +35,9 @@ public:
     void writeAdjacencyMatrixToFile(std::string);
     void findPoint(int, int, Node *);
     void findPrivatePoint(Encryptor &, PrivPointUtil *, helib::Ctxt , helib::Ctxt &, helib::Ctxt, Node *, int, int);
+    void cleanTree(Node *);
+    void setupPathLabels(Node *, std::string);
+    void printPathLabels();
 private:
     Node * root;
     int size; //total nodes
