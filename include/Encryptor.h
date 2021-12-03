@@ -1,6 +1,6 @@
 //
 // Copyright SpiRITlab - Computations on Encrypted Data
-// https://gitlab.com/SpiRITlab/coed
+// Publicly available at: https://gitlab.com/SpiRITlab/coed
 //
 
 #ifndef PRIVPOINTLOC_ENCRYPTOR_H

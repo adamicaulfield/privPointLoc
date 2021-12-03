@@ -2,7 +2,7 @@
 // Created by Peizhao Hu on 7/8/20.
 //
 // Copyright SpiRITlab - Computations on Encrypted Data
-// https://gitlab.com/SpiRITlab/coed
+// Publicly available at: https://gitlab.com/SpiRITlab/coed
 //
 //
 

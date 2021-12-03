@@ -562,6 +562,13 @@ void Tree::findPoint(int x, int y, Node * startNode){
 // Encrypted -- Serial
 void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
 	if(startNode != nullptr){
+
+	    // Needed for comparisons
+	    helib::Ptxt<helib::BGV> ones(*(encryptor.getContext()));
+        for(int i=0; i<maxBits; i++){
+            ones[i] = 1;
+        }
+
 		NodeType nt = startNode->getNodeType();
 		if(nt == NodeType::x){
 			printf("\t Checking X-Node\n");
@@ -578,14 +585,19 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
 			helib::Ctxt tmpResult2(tmpResult);
 
-			helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
-			// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
-			tmpResult.multiplyBy(ltCtxt);
+//			helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+//			// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
+//			tmpResult.multiplyBy(ltCtxt);
+
 			// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
 			helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
 			// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, maxBits);
 			tmpResult2.multiplyBy(gtCtxt);
 			// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", tmpResult2, maxBits);
+
+			helib::Ctxt ltCtxt = gtCtxt;
+			ltCtxt.addConstant(ones);
+            tmpResult.multiplyBy(ltCtxt);
 
 			// Move to left
 			// printf("\t Checking Left\n");
@@ -652,10 +664,14 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
 			helib::Ctxt tmpResult2(tmpResult);
 
-			tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
+//			tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
 			// encryptor.decryptAndPrintCondensed("pointCtxt <= yVertex", tmpResult, maxBits);
-			tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));
+			helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1);
+			tmpResult2.multiplyBy(gtCtxt);
 			// encryptor.decryptAndPrintCondensed("pointCtxt > yVertex", tmpResult, maxBits);
+            helib::Ctxt ltCtxt = gtCtxt;
+            ltCtxt.addConstant(ones);
+            tmpResult.multiplyBy(ltCtxt);
 
 			// printf("\t Checking Left\n");
 			// Move to left
