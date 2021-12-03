@@ -860,6 +860,7 @@ void Tree::findPrivatePoint2(Encryptor &encryptor, PrivPointUtil * privUtil, hel
 	} 
 }
 
+// Evaluate one path (for debugging)
 void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
 	Node * startNode = root;
 	helib::Ctxt zeros(*(encryptor.getPublicKey()));
