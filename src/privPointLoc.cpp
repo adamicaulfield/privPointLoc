@@ -11,11 +11,129 @@
 #include <stdlib.h>     /* atoi */
 #include "PrivPointUtil.h"
 #include <chrono>
+#include <string>
 
 int main(int argc, char **argv) {
     PrivPointUtil * privUtil = new PrivPointUtil();
-    int mode = atoi(argv[1]);
-    if (mode==0){
+    std::string mode = argv[1];
+    if(mode=="main"){
+        printf("-------------------- DEFAULT VERSION -------------------- \n");
+        
+        int maxBits = atoi(argv[2]);
+        int xCoord = atoi(argv[3]);
+        int yCoord = atoi(argv[4]);
+
+        Tree * tree = new Tree();
+
+        printf("----- Read from file, insert into Tree/DAG -----\n");
+        tree->readSegmentsFile("data/ac7717.txt");
+
+
+        printf("----- Print Tree/DAG after read file and insert segments -----\n");
+        tree->cleanTree(tree->getRoot());
+        tree->printTree(tree->getRoot());
+
+        printf("----- Write to Adjacency Matrix -----\n");
+        tree->setupLists(tree->getRoot());
+        tree->initAdjacencyMatrix();
+        tree->writeAdjacencyMatrix(tree->getRoot());
+        tree->wrireSumsAdjacencyMatrix();
+
+        printf("----- Path Labels -----\n");
+        tree->setupPathLabels(tree->getRoot(), "");
+        tree->printPathLabels();
+
+        std::vector<std::string> allPaths = tree->getAllPaths();
+
+        printf("\nFINDING POINT: (%d,%d)\n", xCoord,yCoord);
+        tree->findPoint(xCoord, yCoord, tree->getRoot());
+
+        printf("-------------------- ENCRYPTED VERSION -------------------- \n");
+        printf("------ Initialize Encryptor Object ------\n");
+        unsigned long plaintext_prime_modulus = 2;
+        unsigned long phiM = 21845;
+        unsigned long lifting = 1;
+        unsigned long numOfBitsOfModulusChain = 512+256;
+        unsigned long numOfColOfKeySwitchingMatrix = 2;  
+        
+        Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
+        
+        int nSlots = encryptor.getEncryptedArray()->size();
+        std::cout << "Slot count: " << nSlots << std::endl;
+        printf("------ Done ------\n\n");
+
+        std::vector<long> xPointBits = privUtil->encodePoint(maxBits, xCoord, nSlots);
+        std::vector<long> yPointBits = privUtil->encodePoint(maxBits, yCoord, nSlots);
+
+        std::vector<long> pointBits(nSlots);
+        std::vector<long> ones(nSlots);
+        for(int i=0; i<maxBits; i++){
+            
+            pointBits[i] = xPointBits[i];
+            pointBits[i+maxBits] = yPointBits[i];    
+            
+            ones[i] = 1;
+        }
+
+        printf("LOCATE PRIVATE POINT (%d, %d)\n", xCoord, yCoord);
+        // for(int i=0; i<maxBits*2; i++){
+        //     std::cout << pointBits[i] << " "; 
+        // }    
+        // std::cout << std::endl;
+        printf("---- User side ---- \n");
+
+        helib::Ctxt pointCtxt (*(encryptor.getPublicKey()));
+        
+        helib::Ctxt resultCtxt(*(encryptor.getPublicKey()));
+
+        printf("\tEncrypting point.... ");
+        encryptor.getEncryptedArray()->encrypt(pointCtxt, *(encryptor.getPublicKey()), pointBits);
+
+        // encryptor.getEncryptedArray()->encrypt(resultCtxt, *(encryptor.getPublicKey()), ones);
+        printf(" Done\n");
+        // encryptor.decryptAndPrintCondensed("init tmpResult", tmpResult, maxBits);
+        // encryptor.getEncryptedArray()->encrypt(resultCtxt, *(encryptor.getPublicKey()), ones);
+        printf("\tSending to Cloud for Planar Point Location\n");
+
+        printf("---- Cloud Side ---- \n");
+        
+        printf("\tBeginning location....\n");
+        auto start = std::chrono::high_resolution_clock::now();
+        // tree->findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, tree->getRoot(), maxBits, nSlots);
+        // tree->findPrivatePoint2(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, tree->getRoot(), maxBits, nSlots);
+        // tree->findPrivatePoint2(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, maxBits, nSlots);
+        // int pathID = atoi(argv[5]);
+        #pragma omp parallel for
+        for(int pathID=0; pathID<allPaths.size(); pathID++){
+            printf("\tStarting path %d\n", pathID);
+            helib::Ctxt tmpResult(*(encryptor.getPublicKey()));
+            encryptor.getEncryptedArray()->encrypt(tmpResult, *(encryptor.getPublicKey()), ones);
+            std::string pathLabel = allPaths[pathID];
+            tree->evaluatePath(encryptor, privUtil, pointCtxt, tmpResult, maxBits, nSlots, pathLabel);
+
+            //result <-- result OR tmpResult
+            helib::Ctxt andCtxt(tmpResult); //and
+
+            #pragma critical
+            {
+                andCtxt.multiplyBy(resultCtxt);
+                resultCtxt += tmpResult; //xor
+                resultCtxt += andCtxt;       //xor + and
+                printf("\tPath %d done\n", pathID);
+            }
+        }
+
+        auto stop = std::chrono::high_resolution_clock::now();            
+        printf("\tComplete. Sending back to user ....\n");
+
+        printf("---- User Side ---- \n");
+        printf("\tReceiving ciphertext form cloud. Decrypting: \n");
+        printf("\t");
+        encryptor.decryptAndPrintCondensed("Result", resultCtxt, tree->getTotalTrapezoids()+1);
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+        printf("\tSeconds to find point: %0.2f\n", duration.count()/1000.0);
+    }
+    else if (mode=="ptxt"){
         printf("-------------------- START MAIN -------------------- \n");
         
         Tree * tree = new Tree();
@@ -61,54 +179,7 @@ int main(int argc, char **argv) {
         // printf("\nFINDING POINT: (%d,%d)\n", x,y);
         // tree->findPoint(x,y, tree->getRoot());
     } 
-    else if(mode == 1){
-        unsigned long plaintext_prime_modulus = 2;
-        unsigned long phiM = 21845;
-        unsigned long lifting = 1;
-        unsigned long numOfBitsOfModulusChain = 256;
-        unsigned long numOfColOfKeySwitchingMatrix = 2;  
-        
-        printf("------ Initialize Encryptor Object ------\n");
-        Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
-        printf("------ Done ------\n\n");
-        int nSlots = encryptor.getEncryptedArray()->size();
-        std::cout << "Slot count: " << nSlots << std::endl;
-
-        int maxBits = 4;
-
-        int point = atoi(argv[2]);
-        int regionVertex = atoi(argv[3]);
-
-        std::vector<long> pointBits = privUtil->encodePoint(maxBits, point, nSlots);
-        helib::Ctxt pointCtxt (*(encryptor.getPublicKey()));
-        encryptor.getEncryptedArray()->encrypt(pointCtxt, *(encryptor.getPublicKey()), pointBits);
-
-        std::vector<long> regionVertexBits = privUtil->encodePoint(maxBits, regionVertex, nSlots);
-
-        printf("x=%d in bits: ", point);
-        for(int i=0; i<maxBits*2; i++){
-            std::cout << pointBits[i] << " "; 
-        }    
-        std::cout << std::endl;
-
-        helib::Ptxt<helib::BGV> regionVertextPtxt (*(encryptor.getContext())); 
-        printf("Vertex=%d in bits: ", regionVertex);
-        for(int i=0; i<2*maxBits; i++){
-            regionVertextPtxt[i] = regionVertexBits[i];
-            std::cout << regionVertexBits[i] << " "; 
-        }
-        std::cout << "\n" << std::endl;
-
-        helib::Ctxt result = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt, 0);
-        encryptor.decryptAndPrintCondensed("FINAL: prod", result, 2*maxBits);
-
-        printf("COMPARE A=%d and B=%d\n", point, regionVertex);
-        result = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt);
-        encryptor.decryptAndPrintCondensed("A>B", result, 2*maxBits);
-
-        result = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, regionVertextPtxt);
-        encryptor.decryptAndPrintCondensed("A<=B", result, 2*maxBits);
-    } else if(mode==2){
+    else if(mode=="path"){
         printf("-------------------- DEFAULT VERSION -------------------- \n");
         
         int maxBits = atoi(argv[2]);
@@ -119,17 +190,24 @@ int main(int argc, char **argv) {
 
         printf("----- Read from file, insert into Tree/DAG -----\n");
         tree->readSegmentsFile("data/ac7717.txt");
-        
+
+
         printf("----- Print Tree/DAG after read file and insert segments -----\n");
+        tree->cleanTree(tree->getRoot());
         tree->printTree(tree->getRoot());
 
-        printf("----- Write Adjacency Matrix -----\n");
+        printf("----- Write to Adjacency Matrix -----\n");
         tree->setupLists(tree->getRoot());
         tree->initAdjacencyMatrix();
         tree->writeAdjacencyMatrix(tree->getRoot());
         tree->wrireSumsAdjacencyMatrix();
 
-        printf("----  Enter a Point in the form \"x y\" to discover which trapezoid it is located in: \n");
+        printf("----- Path Labels -----\n");
+        tree->setupPathLabels(tree->getRoot(), "");
+        tree->printPathLabels();
+
+        std::vector<std::string> allPaths = tree->getAllPaths();
+
         printf("\nFINDING POINT: (%d,%d)\n", xCoord,yCoord);
         tree->findPoint(xCoord, yCoord, tree->getRoot());
 
@@ -168,21 +246,141 @@ int main(int argc, char **argv) {
         printf("---- User side ---- \n");
 
         helib::Ctxt pointCtxt (*(encryptor.getPublicKey()));
-        helib::Ctxt tmpResult(*(encryptor.getPublicKey()));
+        
         helib::Ctxt resultCtxt(*(encryptor.getPublicKey()));
 
         printf("\tEncrypting point.... ");
         encryptor.getEncryptedArray()->encrypt(pointCtxt, *(encryptor.getPublicKey()), pointBits);
-        encryptor.getEncryptedArray()->encrypt(tmpResult, *(encryptor.getPublicKey()), ones);
+
+        // encryptor.getEncryptedArray()->encrypt(resultCtxt, *(encryptor.getPublicKey()), ones);
         printf(" Done\n");
         // encryptor.decryptAndPrintCondensed("init tmpResult", tmpResult, maxBits);
         // encryptor.getEncryptedArray()->encrypt(resultCtxt, *(encryptor.getPublicKey()), ones);
         printf("\tSending to Cloud for Planar Point Location\n");
 
         printf("---- Cloud Side ---- \n");
+        
+        printf("\tBeginning location....\n");
+        auto start = std::chrono::high_resolution_clock::now();
+        // tree->findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, tree->getRoot(), maxBits, nSlots);
+        // tree->findPrivatePoint2(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, tree->getRoot(), maxBits, nSlots);
+        // tree->findPrivatePoint2(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, maxBits, nSlots);
+        
+        int pathID = atoi(argv[5]);
+        printf("\tStarting path %d\n", pathID);
+        helib::Ctxt tmpResult(*(encryptor.getPublicKey()));
+        encryptor.getEncryptedArray()->encrypt(tmpResult, *(encryptor.getPublicKey()), ones);
+        std::string pathLabel = allPaths[pathID];
+        tree->evaluatePath(encryptor, privUtil, pointCtxt, tmpResult, maxBits, nSlots, pathLabel);
+
+        //result <-- result OR tmpResult
+        helib::Ctxt andCtxt(tmpResult); //and
+
+    
+        andCtxt.multiplyBy(resultCtxt);
+        resultCtxt += tmpResult; //xor
+        resultCtxt += andCtxt;       //xor + and
+        printf("\tPath %d done\n", pathID);
+        
+
+        auto stop = std::chrono::high_resolution_clock::now();            
+        printf("\tComplete. Sending back to user ....\n");
+
+        printf("---- User Side ---- \n");
+        printf("\tReceiving ciphertext form cloud. Decrypting: \n");
+        printf("\t");
+        encryptor.decryptAndPrintCondensed("Result", resultCtxt, tree->getTotalTrapezoids()+1);
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+        printf("\tSeconds to find point: %0.2f\n", duration.count()/1000.0);
+    } else if (mode=="serial"){
+        printf("-------------------- DEFAULT VERSION -------------------- \n");
+        
+        int maxBits = atoi(argv[2]);
+        int xCoord = atoi(argv[3]);
+        int yCoord = atoi(argv[4]);
+
+        Tree * tree = new Tree();
+
+        printf("----- Read from file, insert into Tree/DAG -----\n");
+        tree->readSegmentsFile("data/ac7717.txt");
+
+
+        printf("----- Print Tree/DAG after read file and insert segments -----\n");
+        tree->cleanTree(tree->getRoot());
+        tree->printTree(tree->getRoot());
+
+        printf("----- Write to Adjacency Matrix -----\n");
+        tree->setupLists(tree->getRoot());
+        tree->initAdjacencyMatrix();
+        tree->writeAdjacencyMatrix(tree->getRoot());
+        tree->wrireSumsAdjacencyMatrix();
+
+        printf("----- Path Labels -----\n");
+        tree->setupPathLabels(tree->getRoot(), "");
+        tree->printPathLabels();
+
+        std::vector<std::string> allPaths = tree->getAllPaths();
+
+        printf("\nFINDING POINT: (%d,%d)\n", xCoord,yCoord);
+        tree->findPoint(xCoord, yCoord, tree->getRoot());
+
+        printf("-------------------- ENCRYPTED VERSION -------------------- \n");
+        printf("------ Initialize Encryptor Object ------\n");
+        unsigned long plaintext_prime_modulus = 2;
+        unsigned long phiM = 21845;
+        unsigned long lifting = 1;
+        unsigned long numOfBitsOfModulusChain = 512+256;
+        unsigned long numOfColOfKeySwitchingMatrix = 2;  
+        
+        Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);
+        
+        int nSlots = encryptor.getEncryptedArray()->size();
+        std::cout << "Slot count: " << nSlots << std::endl;
+        printf("------ Done ------\n\n");
+
+        std::vector<long> xPointBits = privUtil->encodePoint(maxBits, xCoord, nSlots);
+        std::vector<long> yPointBits = privUtil->encodePoint(maxBits, yCoord, nSlots);
+
+        std::vector<long> pointBits(nSlots);
+        std::vector<long> ones(nSlots);
+        for(int i=0; i<maxBits; i++){
+            
+            pointBits[i] = xPointBits[i];
+            pointBits[i+maxBits] = yPointBits[i];    
+            
+            ones[i] = 1;
+        }
+
+        printf("LOCATE PRIVATE POINT (%d, %d)\n", xCoord, yCoord);
+        // for(int i=0; i<maxBits*2; i++){
+        //     std::cout << pointBits[i] << " "; 
+        // }    
+        // std::cout << std::endl;
+        printf("---- User side ---- \n");
+
+        helib::Ctxt pointCtxt (*(encryptor.getPublicKey()));
+        helib::Ctxt resultCtxt(*(encryptor.getPublicKey()));
+        helib::Ctxt tmpResult(*(encryptor.getPublicKey()));
+
+        printf("\tEncrypting point.... ");
+        encryptor.getEncryptedArray()->encrypt(tmpResult, *(encryptor.getPublicKey()), ones);
+        encryptor.getEncryptedArray()->encrypt(pointCtxt, *(encryptor.getPublicKey()), pointBits);
+
+        // encryptor.getEncryptedArray()->encrypt(resultCtxt, *(encryptor.getPublicKey()), ones);
+        printf(" Done\n");
+        // encryptor.decryptAndPrintCondensed("init tmpResult", tmpResult, maxBits);
+        // encryptor.getEncryptedArray()->encrypt(resultCtxt, *(encryptor.getPublicKey()), ones);
+        printf("\tSending to Cloud for Planar Point Location\n");
+
+        printf("---- Cloud Side ---- \n");
+        
         printf("\tBeginning location....\n");
         auto start = std::chrono::high_resolution_clock::now();
         tree->findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, tree->getRoot(), maxBits, nSlots);
+        // tree->findPrivatePoint2(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, tree->getRoot(), maxBits, nSlots);
+        // tree->findPrivatePoint2(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, maxBits, nSlots);
+        // int pathID = atoi(argv[5]);
+
         auto stop = std::chrono::high_resolution_clock::now();            
         printf("\tComplete. Sending back to user ....\n");
 

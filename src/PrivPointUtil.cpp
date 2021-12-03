@@ -35,8 +35,8 @@ std::vector<long> PrivPointUtil::encodePoint(int maxBits, int p, int nSlots){
 
 // Compare CTXT(A) to PTXT(B)
 helib::Ctxt PrivPointUtil::secureGT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b){
-    printf("\tStarting secureGT(ctxt,ptxt)...");
-    auto start = std::chrono::high_resolution_clock::now();
+    printf("\tStarting secureGT(ctxt,ptxt)...\n");
+    // auto start = std::chrono::high_resolution_clock::now();
     helib::Ptxt<helib::BGV> bitFilter (*(encryptor.getContext()));
     for(int i=0; i<maxBits; i++){
         bitFilter[i] = 1;
@@ -92,16 +92,16 @@ helib::Ctxt PrivPointUtil::secureGT(Encryptor &encryptor, int maxBits, int nSlot
     }
     // encryptor.decryptAndPrintCondensed("before total sums", a, 2*maxBits);
     helib::totalSums(*encryptor.getEncryptedArray(), a);
-    auto stop = std::chrono::high_resolution_clock::now(); 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
     // encryptor.decryptAndPrintCondensed("ctxt > ptxt", a, maxBits);
-    printf("Done (%0.2fs)\n", duration.count()/1000.0);
+    // auto stop = std::chrono::high_resolution_clock::now(); 
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+    // printf("Done (%0.2fs)\n", duration.count()/1000.0);
     return a;
 }
 
 helib::Ctxt PrivPointUtil::secureLT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b){
-    printf("\tStarting secureLT(ctxt,ptxt)...");
-    auto start = std::chrono::high_resolution_clock::now();
+    printf("\tStarting secureLT(ctxt,ptxt)...\n");
+    // auto start = std::chrono::high_resolution_clock::now();
     helib::Ptxt<helib::BGV> bitFilter (*(encryptor.getContext()));
     for(int i=0; i<maxBits; i++){
         bitFilter[i] = 1;
@@ -157,17 +157,17 @@ helib::Ctxt PrivPointUtil::secureLT(Encryptor &encryptor, int maxBits, int nSlot
     eq.multByConstant(firstSlot); // Add in the case where the two are equal (E4E3E2E1)
     a += eq; // slots are (E4E3E2L1 or E4E3E2E1), E4E3L2, E4L3, L4
     helib::totalSums(*encryptor.getEncryptedArray(), a); // sum all results
-    auto stop = std::chrono::high_resolution_clock::now(); 
     // encryptor.decryptAndPrintCondensed("ctxt < ptxt", a, maxBits);
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
-    printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
+    // auto stop = std::chrono::high_resolution_clock::now(); 
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+    // printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
     return a;
 }
 
 // COMPARE CTXT(A) to CTXT(A)
 helib::Ctxt PrivPointUtil::secureGT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ctxt b){
-    printf("\tStarting secureGT(ctxt,ctxt)...");
-    auto start = std::chrono::high_resolution_clock::now();
+    printf("\tStarting secureGT(ctxt,ctxt)...\n");
+    // auto start = std::chrono::high_resolution_clock::now();
     helib::Ptxt<helib::BGV> bitFilter (*(encryptor.getContext()));
     for(int i=0; i<maxBits; i++){
         bitFilter[i] = 1;
@@ -217,15 +217,15 @@ helib::Ctxt PrivPointUtil::secureGT(Encryptor &encryptor, int maxBits, int nSlot
     }
     helib::totalSums(*encryptor.getEncryptedArray(), a);
     // encryptor.decryptAndPrintCondensed("ctxt > ptxt", a, maxBits);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
-    printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
+    // auto stop = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+    // printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
     return a;
 }
 
 helib::Ctxt PrivPointUtil::secureLT(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ctxt b){
-    printf("\tStarting secureLT(ctxt,ctxt)...");
-    auto start = std::chrono::high_resolution_clock::now();
+    printf("\tStarting secureLT(ctxt,ctxt)...\n");
+    // auto start = std::chrono::high_resolution_clock::now();
     helib::Ptxt<helib::BGV> bitFilter (*(encryptor.getContext()));
     for(int i=0; i<maxBits; i++){
         bitFilter[i] = 1;
@@ -282,16 +282,16 @@ helib::Ctxt PrivPointUtil::secureLT(Encryptor &encryptor, int maxBits, int nSlot
     eq.multByConstant(firstSlot); // Add in the case where the two are equal (E4E3E2E1)
     a += eq; // slots are (E4E3E2L1 or E4E3E2E1), E4E3L2, E4L3, L4
     helib::totalSums(*encryptor.getEncryptedArray(), a); // sum all results
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
-    printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
+    // auto stop = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+    // printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
     // encryptor.decryptAndPrintCondensed("ctxt < ptxt", a, maxBits);
     return a;
 }
 
 helib::Ctxt PrivPointUtil::binaryMult(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b, int y){
-    printf("\tStarting binaryMult(ctxt, ptxt)...");
-    auto start = std::chrono::high_resolution_clock::now();
+    printf("\tStarting binaryMult(ctxt, ptxt)...\n");
+    // auto start = std::chrono::high_resolution_clock::now();
     helib::Ptxt<helib::BGV> pointMask (*(encryptor.getContext()));
     helib::Ptxt<helib::BGV> zeros (*(encryptor.getContext()));
 
@@ -364,15 +364,15 @@ helib::Ctxt PrivPointUtil::binaryMult(Encryptor &encryptor, int maxBits, int nSl
     // printf("\n");
     // encryptor.decryptAndPrintCondensed("FINAL: binaryProd", binaryProd, 2*maxBits);
     binaryProd.multByConstant(bitFilter); // Ensure result is only maxBits length
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
-    printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
+    // auto stop = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+    // printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
     return binaryProd;
 }
 
 helib::Ctxt PrivPointUtil::binaryAdd(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b){
-    printf("\tStarting binaryAdd(ctxt, ptxt)...");
-    auto start = std::chrono::high_resolution_clock::now();
+    printf("\tStarting binaryAdd(ctxt, ptxt)...\n");
+    // auto start = std::chrono::high_resolution_clock::now();
     helib::Ptxt<helib::BGV> bitFilter (*(encryptor.getContext()));
     for(int i=0; i<maxBits; i++){
         bitFilter[i] = 1;
@@ -412,8 +412,8 @@ helib::Ctxt PrivPointUtil::binaryAdd(Encryptor &encryptor, int maxBits, int nSlo
         // Rotate forward so it is used as C_in for next round
         encryptor.getEncryptedArray()->rotate(carry, 1);
     }
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
-    printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
+    // auto stop = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+    // printf("\tDone (%0.2fs)\n", duration.count()/1000.0);
     return sum;
 }

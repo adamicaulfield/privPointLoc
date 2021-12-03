@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "omp.h"
 
 Tree::Tree(){
 	size = 0;
@@ -27,6 +28,10 @@ int Tree::getTreeSize(){
 
 int Tree::getTotalTrapezoids(){
 	return totalTrapezoids;
+}
+
+std::vector<std::string> Tree::getAllPaths(){
+	return allPaths;
 }
 
 /*********** Tree/DAG Setup functions ***********/
@@ -326,10 +331,11 @@ void Tree::cleanTree(Node * startNode){
 
 // Prints path labels for each leaf node, assumes call to setupLists() already occurred.
 void Tree::printPathLabels(){
-	std::cout << "Path Labels for each Trapezoid (Leaf)" << std::endl;
+	printf("Path Labels for each Trapezoid (%d):\n", totalTrapezoids);
 	for(int i=0; i<tList.size(); i++){
-		std::cout << tList[i]->getMatrixLabel() << ": ";
+		std::cout << tList[i]->getMatrixLabel();
 		std::vector<std::string> pathLabels = tList[i]->getPathLabels();
+		std::cout << " (" << int(pathLabels.size()) << "): ";
 		for(int j=0; j<pathLabels.size(); j++){
 			std::cout << pathLabels[j] << " ";
 		}
@@ -337,13 +343,13 @@ void Tree::printPathLabels(){
 	}
 }
 
-
 // Setup path labels as a string represeting right(1) and left(1) turns starting from root. EX: string "001" means left-left-right
 void Tree::setupPathLabels(Node * startNode, std::string label){
 	if(startNode != nullptr){
 		NodeType nt = startNode->getNodeType();
 		if(nt == NodeType::leaf){
 			startNode->addPathLabel(label);
+			allPaths.push_back(label);
 		} else{
 			// Traverse Left
 			setupPathLabels(startNode->getLeft(), label+"0");
@@ -553,7 +559,7 @@ void Tree::findPoint(int x, int y, Node * startNode){
 	}
 }
 
-// Encrypted
+// Encrypted -- Serial
 void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
 	if(startNode != nullptr){
 		NodeType nt = startNode->getNodeType();
@@ -677,5 +683,267 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 			// printf("\t Accumulated result\n");
 
 		}
+	}
+}
+
+// Encrypted -- Parallel v1
+void Tree::findPrivatePoint2(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
+	if(startNode != nullptr){
+		NodeType nt = startNode->getNodeType();
+		if(nt == NodeType::x){
+			printf("\t Checking X-Node\n");
+			// Convert vectex X Point to bin
+			std::vector<long> xVertex = privUtil->encodePoint(maxBits, startNode->getValue(), nSlots);
+			helib::Ptxt<helib::BGV> xVertexPtxt (*(encryptor.getContext()));
+			// printf("xVertex Bits: ");
+			for(int i=0; i<2*maxBits; i++){
+				xVertexPtxt[i] = xVertex[i];
+				// printf("%ld ", xVertex[i]);
+			}
+			// printf("\n");
+
+			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
+			helib::Ctxt tmpResult2(tmpResult);
+
+			#pragma omp parallel
+			{
+				if(omp_get_thread_num()==0){
+					helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+					// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
+					tmpResult.multiplyBy(ltCtxt);
+					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
+				}
+				if(omp_get_thread_num()==1){
+					helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+					// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, maxBits);
+					tmpResult2.multiplyBy(gtCtxt);
+					// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", tmpResult2, maxBits);
+				}
+			}
+
+			// Move to left
+			// printf("\t Checking Left\n");
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
+
+			// Move to right
+			// printf("\t Checking Right\n");
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
+
+		} else if(nt == NodeType::y){
+			printf("\t Checking Y-Node\n");
+			// Convert dy, dx, and dx*intercept to bin
+			int dx = startNode->getSegment()->getDx();
+			int dy = startNode->getSegment()->getDy();
+			int dxb =  dx * startNode->getSegment()->getIntercept();
+
+			std::vector<long> dxBits = privUtil->encodePoint(maxBits, dx, nSlots);
+			std::vector<long> dyBits = privUtil->encodePoint(maxBits, dy, nSlots);
+			std::vector<long> dxbBits = privUtil->encodePoint(maxBits, dxb, nSlots);
+
+			helib::Ptxt<helib::BGV> dxPtxt (*(encryptor.getContext())); 
+			helib::Ptxt<helib::BGV> dyPtxt (*(encryptor.getContext())); 
+			helib::Ptxt<helib::BGV> dxbPtxt (*(encryptor.getContext())); 
+			for(int i=0; i<maxBits; i++){
+			    dxPtxt[i] = dxBits[i];
+			    dyPtxt[i] = dyBits[i];
+			    dxbPtxt[i] = dxbBits[i];
+			}			
+
+			// printf("dxPtxt (%d): ", dx);
+			// for(int i=0; i<maxBits; i++){
+			//     printf("%ld ", dxBits[i]);
+			// }
+			// printf("\n");	
+
+			// printf("dyPtxt: (%d)", dy);
+			// for(int i=0; i<maxBits; i++){
+			//     printf("%ld ", dyBits[i]);
+			// }
+			// printf("\n");	
+
+			// printf("dxbPtxt: (%d)", dxb);
+			// for(int i=0; i<maxBits; i++){
+			//     printf("%ld ", dxbBits[i]);
+			// }
+			// printf("\n");	
+
+			helib::Ctxt dyx(*(encryptor.getPublicKey()));
+			helib::Ctxt dxy(*(encryptor.getPublicKey()));
+
+			#pragma omp parallel
+			{
+				if(omp_get_thread_num()==0){
+					dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
+				}
+
+				if(omp_get_thread_num()==1){
+					dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
+				}
+			}
+
+			// Compute dy*[x]+dxb
+			// helib::Ctxt dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
+			// printf("\t");
+			// encryptor.decryptAndPrintCondensed("dyx", dyx, maxBits);
+
+			// Compute dx*[y]
+			// helib::Ctxt dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
+			// printf("\t");
+			// encryptor.decryptAndPrintCondensed("dxy", dxy, maxBits);
+
+			// Move to left if dx[y] <= (c1=dy[x]+dxb)
+			helib::Ctxt c1 = privUtil->binaryAdd(encryptor, maxBits, nSlots, dyx, dxbPtxt);
+			// printf("\t");
+			// encryptor.decryptAndPrintCondensed("c1", c1, maxBits);
+
+			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
+			helib::Ctxt tmpResult2(tmpResult);
+
+			#pragma omp parallel
+			{
+				if(omp_get_thread_num()==0){
+					tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
+				}
+
+				if(omp_get_thread_num()==1){
+					tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));
+				}
+			}
+
+			// tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
+			// encryptor.decryptAndPrintCondensed("pointCtxt <= yVertex", tmpResult, maxBits);
+			// tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));
+			// encryptor.decryptAndPrintCondensed("pointCtxt > yVertex", tmpResult, maxBits);
+
+			// printf("\t Checking Left\n");
+			// Move to left
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
+
+			// printf("\t Checking Right\n");
+			// Move to right
+			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
+
+		} else{ // Leaf Node
+			// Mask result based on T_ID
+			int tID = startNode->getValue();
+			// printf("\tGot to TID=%d\n", tID);
+			// encryptor.decryptAndPrintCondensed("tmpResult", tmpResult, maxBits);
+			helib::Ptxt<helib::BGV> mask (*(encryptor.getContext())); 
+			mask[tID] = 1;
+			tmpResult.multByConstant(mask);
+			
+			// resultCtxt = resultCtxt OR tmpResult = xor(r,t) + and(r,t)
+			helib::Ctxt andCtxt(tmpResult); //and
+			andCtxt.multiplyBy(resultCtxt);
+
+			resultCtxt += tmpResult;	//xor
+			resultCtxt += andCtxt;		//xor + and
+			// printf("\t Accumulated result\n");
+
+		}
 	} 
+}
+
+void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
+	Node * startNode = root;
+	helib::Ctxt zeros(*(encryptor.getPublicKey()));
+	for(int s=0; s<pathLabel.size(); s++){
+		if(startNode != nullptr){
+			NodeType nt = startNode->getNodeType();
+			if(nt == NodeType::x){
+				printf("\t Checking X-Node\n");
+				// Convert vectex X Point to bin
+				std::vector<long> xVertex = privUtil->encodePoint(maxBits, startNode->getValue(), nSlots);
+				helib::Ptxt<helib::BGV> xVertexPtxt (*(encryptor.getContext()));
+				// printf("xVertex Bits: ");
+				for(int i=0; i<2*maxBits; i++){
+					xVertexPtxt[i] = xVertex[i];
+					// printf("%ld ", xVertex[i]);
+				}
+				
+				// printf("\t Checking Left\n");
+				if(pathLabel.at(s) == '0'){
+					// Move to left
+					helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
+					// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
+					resultCtxt.multiplyBy(ltCtxt);
+					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", resultCtxt, maxBits);
+					startNode = startNode->getLeft();
+				} else if(pathLabel.at(s) == '1'){
+					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
+					helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+					// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, maxBits);
+					resultCtxt.multiplyBy(gtCtxt);
+					// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", resultCtxt, maxBits);
+					startNode = startNode->getRight();
+				}
+
+			} else if(nt == NodeType::y){
+				printf("\t Checking Y-Node\n");
+				// Convert dy, dx, and dx*intercept to bin
+				int dx = startNode->getSegment()->getDx();
+				int dy = startNode->getSegment()->getDy();
+				int dxb =  dx * startNode->getSegment()->getIntercept();
+
+				std::vector<long> dxBits = privUtil->encodePoint(maxBits, dx, nSlots);
+				std::vector<long> dyBits = privUtil->encodePoint(maxBits, dy, nSlots);
+				std::vector<long> dxbBits = privUtil->encodePoint(maxBits, dxb, nSlots);
+
+				helib::Ptxt<helib::BGV> dxPtxt (*(encryptor.getContext())); 
+				helib::Ptxt<helib::BGV> dyPtxt (*(encryptor.getContext())); 
+				helib::Ptxt<helib::BGV> dxbPtxt (*(encryptor.getContext())); 
+				for(int i=0; i<maxBits; i++){
+				    dxPtxt[i] = dxBits[i];
+				    dyPtxt[i] = dyBits[i];
+				    dxbPtxt[i] = dxbBits[i];
+				}			
+
+				// Compute dy*[x]+dxb
+				helib::Ctxt dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
+				// printf("\t");
+				// encryptor.decryptAndPrintCondensed("dyx", dyx, maxBits);
+
+				// Compute dx*[y]
+				helib::Ctxt dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
+				// printf("\t");
+				// encryptor.decryptAndPrintCondensed("dxy", dxy, maxBits);
+
+				// Move to left if dx[y] <= (c1=dy[x]+dxb)
+				helib::Ctxt c1 = privUtil->binaryAdd(encryptor, maxBits, nSlots, dyx, dxbPtxt);
+				// printf("\t");
+				// encryptor.decryptAndPrintCondensed("c1", c1, maxBits);
+
+				if(pathLabel.at(s) == '0'){
+					// printf("\t Checking Left\n");
+					resultCtxt.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
+					startNode = startNode->getLeft();
+					// Move to left
+				} else if(pathLabel.at(s) == '1'){
+					// printf("\t Checking Right\n");
+					// Move to right
+					resultCtxt.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));	
+					startNode = startNode->getRight();
+				}
+			}
+		}
+	}
+	// Leaf Node
+	// Mask result based on T_ID
+	int tID = startNode->getValue();
+	printf("\tGot to Leaf %d\n", tID);
+	// encryptor.decryptAndPrintCondensed("tmpResult", tmpResult, maxBits);
+	helib::Ptxt<helib::BGV> mask (*(encryptor.getContext())); 
+	mask[tID] = 1;
+	resultCtxt.multByConstant(mask);
+	
+	// resultCtxt = resultCtxt OR tmpResult = xor(r,t) + and(r,t) 
+	// Not done for one path, move to other function.
+
+	// helib::Ctxt andCtxt(tmpResult); //and
+	// andCtxt.multiplyBy(resultCtxt);
+
+	// resultCtxt += tmpResult;	//xor
+	// resultCtxt += andCtxt;		//xor + and
+	// printf("\t Accumulated result\n");
 }
