@@ -88,7 +88,7 @@ void Tree::insert(Segment * s){
 		maxX = xr;
 	} 
 	else if(xr < minX && xl < minX){ // Whole segment is to left of current map
-		printf("\tAdding seg to tree: seg left of whole map\n");
+		printf("\tAdding seg to tree: seg left of whole map: %d < %d AND %d < %d\n", xr, minX, xl, minX);
 		Node * searchNode = root;
 		Node * prevNode;
 		while(searchNode->getNodeType() != NodeType::leaf){
@@ -111,7 +111,7 @@ void Tree::insert(Segment * s){
 		minX = xr;
 	}
 	else if(xl > maxX && xr > maxX){ // whole segment is to the right of current map
-		printf("\tAdding seg to tree: seg right of whole map\n");
+		printf("\tAdding seg to tree: seg right of whole map: %d > %d AND %d > %d\n", xr, maxX, xl, maxX);
 		Node * searchNode = root;
 		Node * prevNode;
 		while(searchNode->getNodeType() != NodeType::leaf){
@@ -137,6 +137,14 @@ void Tree::insert(Segment * s){
 	else{ // segment falls into the middle of the current map
 		printf("\tAdding seg to tree, tree has size > 0\n");
 		// Locate trapezoid leaf node which holds the left endpoint
+		if(xr > maxX){
+			maxX = xr;
+		}
+
+		if(xl < minX){
+			minX = xl;
+		}
+
 		Node * searchNode = root;
 		Node * prevNode;
 		NodeType searchNodeType = searchNode->getNodeType();
