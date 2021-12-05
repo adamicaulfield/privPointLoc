@@ -56,6 +56,7 @@ private:
     std::vector<Node *> tList;
     std::vector<std::vector<std::string>> adjMatrix;
     std::vector<std::string> allPaths;
+    int minX, maxX;
 };
 
 #endif /*PRIVPOINTLOC_TREE_H*/

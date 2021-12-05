@@ -62,10 +62,10 @@ void Tree::insert(Segment * s){
 	seg->setValue(totalSegments);
 	s->setSegID(totalSegments);
 
-	if(size == 0){
+	if(size == 0){ // No segments added yet
 		printf("\tAdding seg to tree, tree has size = 0\n");
-		printf("LEFT ENDPOINT: (%d,%d)\n", xl, yl);
-		printf("RIGHT ENDPOINT: (%d,%d)\n", xr, yr);
+		// printf("LEFT ENDPOINT: (%d,%d)\n", xl, yl);
+		// printf("RIGHT ENDPOINT: (%d,%d)\n", xr, yr);
 		// Add point nodes
 		if(yl > yr){
 
@@ -74,17 +74,67 @@ void Tree::insert(Segment * s){
 
 			// Add segment node
 			r->setLeft(seg);
-			addLeafNodes(root);
 		} else{
 			root = r;
 			r->setLeft(l);
 
 			// Add segment node
 			l->setRight(seg);
-			addLeafNodes(root);
 		}
+		addLeafNodes(root);
+		// printTree(root);
 
-	} else{
+		minX = xl;
+		maxX = xr;
+	} 
+	else if(xr < minX){ // Whole segment is to left of current map
+		printf("\tAdding seg to tree: seg left of whole map\n");
+		Node * searchNode = root;
+		Node * prevNode;
+		while(searchNode->getNodeType() != NodeType::leaf){
+			prevNode = searchNode;
+			searchNode = searchNode->getLeft();
+		}
+		if(yl > yr){
+			l->setRight(r);
+			r->setLeft(seg);
+			prevNode->setLeft(l);
+			delete(searchNode);
+			addLeafNodes(l);
+		} else {
+			r->setLeft(l);
+			l->setRight(seg);
+			prevNode->setLeft(r);
+			delete(searchNode);
+			addLeafNodes(r);
+		}
+		minX = xr;
+	}
+	else if(xl > maxX){ // whole segment is to the right of current map
+		printf("\tAdding seg to tree: seg right of whole map\n");
+		Node * searchNode = root;
+		Node * prevNode;
+		while(searchNode->getNodeType() != NodeType::leaf){
+			prevNode = searchNode;
+			searchNode = searchNode->getRight();
+		}
+		if(yl > yr){
+			l->setRight(r);
+			r->setLeft(seg);
+			prevNode->setRight(l);
+			delete(searchNode);
+			addLeafNodes(l);
+		} else {
+			r->setLeft(l);
+			l->setRight(seg);
+			prevNode->setRight(r);
+			delete(searchNode);
+			addLeafNodes(r);
+		}
+		maxX = xl;	
+	}
+
+	else{ // segment falls into the middle of the current map
 		printf("\tAdding seg to tree, tree has size > 0\n");
 		// Locate trapezoid leaf node which holds the left endpoint
 		Node * searchNode = root;
@@ -99,11 +149,11 @@ void Tree::insert(Segment * s){
 				case NodeType::x:
 					value = searchNode->getValue();
 					if(xl <= searchNode->getValue()){
-						// printf("\tX: %d <= %d-->\n", xl, value);
+						printf("\tX: %d <= %d-->\n", xl, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
-						// printf("\tX: %d > %d-->\n", xl, value);
+						printf("\tX: %d > %d-->\n", xl, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -112,11 +162,11 @@ void Tree::insert(Segment * s){
 				case NodeType::y:
 					value = searchNode->getSegment()->getYonSeg(xl);
 					if(yl <= searchNode->getSegment()->getYonSeg(xl)){
-						// printf("\tY: %d <= %d-->\n", yl, value);
+						printf("\tY: %d <= %d-->\n", yl, value);
 						searchNode = searchNode->getLeft();
 						dir = true;
 					} else{
-						// printf("\tY: %d > %d-->\n", yl, value);
+						printf("\tY: %d > %d-->\n", yl, value);
 						searchNode = searchNode->getRight();
 						dir = false;
 					}
@@ -128,6 +178,7 @@ void Tree::insert(Segment * s){
 		// searchNode now holds leaf node, prevNode now holds its parent
 
 		// replace leaf node with the new x-node
+		// printf("Replacing leaf node with new LEFT x-node\n");
 		if(dir){ //left
 			prevNode->setLeft(l);
 			delete(searchNode);
@@ -187,8 +238,10 @@ void Tree::insert(Segment * s){
 		// Node * seg = new Node(this, s, NodeType::y);
 		// seg->setValue(totalSegments);
 		// s->setSegID(totalSegments);
+		
 		r->setLeft(seg);
 		addLeafNodes(r);
+		
 		// searchNode now holds leaf node, prevNode now holds its parent
 
 	}
@@ -199,30 +252,35 @@ void Tree::insert(Segment * s){
 	
 	totalSegments++;
 	size++;
-	printf("Done\n");
+	// printf("Done insert()\n");
 	// printTree(root);
 }
 
 void Tree::addLeafNodes(Node * node){
 	if(node != nullptr){
+		// printf("At node:%d\n", node->getValue());
 		if(node->getLeft() == nullptr){
+			// printf("Adding leaf at left...\n");
 			Node * leaf = new Node(this, nullptr, NodeType::leaf);
 			leaf->setValue(totalTrapezoids);
 			totalTrapezoids++;
 			node->setLeft(leaf);
 		} else{
 			if(node->getLeft()->getNodeType() != NodeType::leaf){
+				// printf("moving left...\n");
 				addLeafNodes(node->getLeft());	
 			}
 		}
 
 		if(node->getRight() == nullptr){
+			// printf("Adding leaf at right...\n");
 			Node * leaf = new Node(this, nullptr, NodeType::leaf);
 			leaf->setValue(totalTrapezoids);
 			totalTrapezoids++;
 			node->setRight(leaf);
 		} else{
 			if(node->getRight()->getNodeType() != NodeType::leaf){
+				// printf("moving right...\n");
 				addLeafNodes(node->getRight());
 			}
 		}
@@ -265,6 +323,7 @@ void Tree::deleteLeafNodes(Node * node){
 
 // Process Input file, feed segments into tree
 void Tree::readSegmentsFile(std::string filename){
+	printf("starting readSegmentsFile()...\n");
 	std::ifstream segFile(filename);
 	std::string line;
 	std::string delim = " ";
@@ -277,8 +336,15 @@ void Tree::readSegmentsFile(std::string filename){
 				std::stringstream ss;
 				ss << line;
 				ss >> xl >> yl >> xr >> yr;
-				printf("ADDING SEGMENT: (%d, %d)-(%d, %d)\n", xl, yl, xr, yr);
-				insert(new Segment(xl, yl, xr, yr));
+				// Ensures smaller x is treated as left endpoint
+				if(xl < xr){
+					printf("ADDING SEGMENT: (%d, %d)-(%d, %d)\n", xl, yl, xr, yr);
+					insert(new Segment(xl, yl, xr, yr));
+				} else {
+					printf("ADDING SEGMENT: (%d, %d)-(%d, %d)\n", xr, yr, xl, yl);
+					insert(new Segment(xr, yr, xl, yl));
+				}
+				
 			}
 			lineNum++;
 		}
@@ -287,6 +353,7 @@ void Tree::readSegmentsFile(std::string filename){
 	else{
 		std::cout << "Could not open file" << std::endl;
 	}
+	printf("done readSegmentsFile()...\n");
 }
 
 // Prints trees
@@ -907,8 +974,9 @@ void Tree::findPrivatePoint2(Encryptor &encryptor, PrivPointUtil * privUtil, hel
 void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
 	Node * startNode = root;
 	helib::Ctxt zeros(*(encryptor.getPublicKey()));
+	printf("\t\t");
+	encryptor.decryptAndPrintCondensed("resultCtxt", resultCtxt, totalTrapezoids+1);
 	for(int s=0; s<pathLabel.size(); s++){
-		encryptor.decryptAndPrintCondensed("resultCtxt", resultCtxt, totalTrapezoids+1);
 		if(startNode != nullptr){
 			NodeType nt = startNode->getNodeType();
 			if(nt == NodeType::x){
@@ -961,26 +1029,30 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 				helib::Ptxt<helib::BGV> dxPtxt (*(encryptor.getContext())); 
 				helib::Ptxt<helib::BGV> dyPtxt (*(encryptor.getContext())); 
 				helib::Ptxt<helib::BGV> dxbPtxt (*(encryptor.getContext())); 
+				
+				printf("\t\tdxb: ");
 				for(int i=0; i<maxBits; i++){
 				    dxPtxt[i] = dxBits[i];
 				    dyPtxt[i] = dyBits[i];
 				    dxbPtxt[i] = dxbBits[i];
+				    printf("%ld ", dxbBits[i]);
 				}			
+				printf("\n");
 
 				// Compute dy*[x]+dxb
 				helib::Ctxt dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
-				// printf("\t");
-				// encryptor.decryptAndPrintCondensed("dyx", dyx, maxBits);
+				printf("\t\t");
+				encryptor.decryptAndPrintCondensed("dyx", dyx, maxBits);
 
 				// Compute dx*[y]
 				helib::Ctxt dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
-				// printf("\t");
-				// encryptor.decryptAndPrintCondensed("dxy", dxy, maxBits);
+				printf("\t\t");
+				encryptor.decryptAndPrintCondensed("dxy", dxy, maxBits);
 
 				// Move to left if dx[y] <= (c1=dy[x]+dxb)
 				helib::Ctxt c1 = privUtil->binaryAdd(encryptor, maxBits, nSlots, dyx, dxbPtxt);
-				// printf("\t");
-				// encryptor.decryptAndPrintCondensed("c1", c1, maxBits);
+				printf("\t\t");
+				encryptor.decryptAndPrintCondensed("c1", c1, maxBits);
 
 				helib::Ctxt comp = privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1);
 				if(pathLabel.at(s) == '0'){
@@ -990,6 +1062,8 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 					    ones[i] = 1;
 					}
 					comp.addConstant(ones);
+					printf("\t\t");
+					encryptor.decryptAndPrintCondensed("comp", comp, maxBits);
 					resultCtxt.multiplyBy(comp);
 					startNode = startNode->getLeft();
 					// Move to left
@@ -1001,6 +1075,8 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 				}
 			}
 		}
+		printf("\t\t");
+		encryptor.decryptAndPrintCondensed("resultCtxt", resultCtxt, totalTrapezoids+1);
 	}
 	// Leaf Node
 	// Mask result based on T_ID

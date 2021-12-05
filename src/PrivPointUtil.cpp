@@ -11,16 +11,16 @@ std::vector<long> PrivPointUtil::encodePoint(int maxBits, int p, int nSlots){
     int point = std::abs(p);
     std::vector<long> pointBits(nSlots,0);
 
+    // printf("negative %d\n", int(negative));
     for(int i=0; i<maxBits; i++){
         pointBits[i] = long(point/(pow(2,i)))%2;
-
-        // Flip bit for two's compliment
+        // If negative, begin two's compliment (flip bits)
         if(negative){
             pointBits[i] = (pointBits[i]+1)%2;            
-        }
+        }   
     }
 
-    // Add 1 to complete two's compliment
+    // If negative, complete two's compliment (add one)
     if(negative){
         int cin = 1;
         int tmp;
@@ -326,7 +326,7 @@ helib::Ctxt PrivPointUtil::binaryMult(Encryptor &encryptor, int maxBits, int nSl
         bitFilter[i] = 1;
     }
 
-    a.multByConstant(pointMask); // filter only the x coordinate
+    a.multByConstant(pointMask); // filter the coordinate being used
 
     // Multiplying the Y coordinate, need to rotate into position
     if(y==1){
@@ -394,6 +394,7 @@ helib::Ctxt PrivPointUtil::binaryMult(Encryptor &encryptor, int maxBits, int nSl
 helib::Ctxt PrivPointUtil::binaryAdd(Encryptor &encryptor, int maxBits, int nSlots, helib::Ctxt a, helib::Ptxt<helib::BGV> b){
     // printf("\tStarting binaryAdd(ctxt, ptxt)...\n");
     // auto start = std::chrono::high_resolution_clock::now();
+
     helib::Ptxt<helib::BGV> bitFilter (*(encryptor.getContext()));
     for(int i=0; i<maxBits; i++){
         bitFilter[i] = 1;
@@ -401,18 +402,13 @@ helib::Ctxt PrivPointUtil::binaryAdd(Encryptor &encryptor, int maxBits, int nSlo
     a.multByConstant(bitFilter);
 
     helib::Ctxt carry(*(encryptor.getPublicKey()));
-    helib::Ptxt<helib::BGV> accum(*(encryptor.getContext()));;
     helib::Ctxt sum(a);
-
+    // printf("\t\t\t");
+    // encryptor.decryptAndPrintCondensed("sum", sum, maxBits);
     for(int i=0; i<maxBits; i++){
-        for(int j=0; j<nSlots; j++){
-            if(j==i){
-                accum[i] = b[i];
-            } else {
-                accum[i] = 0;
-            }
-        }
-
+        
+        helib::Ptxt<helib::BGV> accum(*(encryptor.getContext()));
+        accum[i] = b[i];
 
         helib::Ctxt tmp1(sum);
         helib::Ctxt tmp2(carry);
@@ -422,13 +418,26 @@ helib::Ctxt PrivPointUtil::binaryAdd(Encryptor &encryptor, int maxBits, int nSlo
         carry.multByConstant(accum);
         tmp3.multiplyBy(tmp2);
 
-        //Sum = a + C_in + tmp
+        //Sum += b + c_in
         sum += tmp2;
-        sum += accum;
+        // printf("\t\t\t");
+        // encryptor.decryptAndPrintCondensed("sum+=tmp2", sum, maxBits);
+
+        // printf("\t\t\t");
+        // printf("accum: ");
+        // for(int j=0; j<maxBits; j++){
+            // printf("%ld", (long)accum[j]);    
+        // }
+        // printf("\n");
+
+        sum.addConstant(accum);
+        // printf("\t\t\t");
+        // encryptor.decryptAndPrintCondensed("sum+=accum", sum, maxBits);
 
         carry += tmp3;
         carry += tmp1;  
-        // encryptor.decryptAndPrintCondensed("   c_out   ", carry, 2*maxBits);
+        // printf("\t\t\t");
+        // encryptor.decryptAndPrintCondensed("c_out", carry, maxBits);
         
         // Rotate forward so it is used as C_in for next round
         encryptor.getEncryptedArray()->rotate(carry, 1);

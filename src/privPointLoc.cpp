@@ -26,7 +26,6 @@ int main(int argc, char **argv) {
     printf("----- Read from file, insert into Tree/DAG -----\n");
     tree->readSegmentsFile("data/ac7717.txt");
 
-
     printf("----- Print Tree/DAG after read file and insert segments -----\n");
     tree->cleanTree(tree->getRoot());
     tree->printTree(tree->getRoot());
