@@ -28,6 +28,7 @@ public:
     void addLeafNodes(Node *);
     void deleteLeafNodes(Node *);
     void setupLists(Node *);
+    void printLists();
     void initAdjacencyMatrix();
     void writeAdjacencyMatrix(Node *);
     void wrireSumsAdjacencyMatrix();
@@ -42,6 +43,8 @@ public:
     void printPathLabels();
     std::vector<std::string> getAllPaths();
     void evaluatePath(Encryptor &, PrivPointUtil *, helib::Ctxt, helib::Ctxt &, int, int, std::string);
+    void evaluatePath2(Encryptor &, PrivPointUtil *, helib::Ctxt, helib::Ctxt &, int, int, std::string);
+    helib::Ctxt evaluateAllNodes(Encryptor &, PrivPointUtil *, helib::Ctxt, int, int);
 private:
     Node * root;
     int size; //total nodes

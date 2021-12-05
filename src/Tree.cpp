@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include "omp.h"
+#include <chrono>
 
 Tree::Tree(){
 	size = 0;
@@ -362,6 +363,32 @@ void Tree::setupPathLabels(Node * startNode, std::string label){
 	}
 }
 
+void Tree::printLists(){
+	printf("P-List: ");
+	for(int i=0; i<pList.size(); i++){
+		printf("%d ", pList[i]->getValue());
+	}
+	printf("\n");
+
+	printf("Q-List: ");
+	for(int i=0; i<qList.size(); i++){
+		printf("%d ", qList[i]->getValue());
+	}
+	printf("\n");
+
+	printf("S-List: ");
+	for(int i=0; i<sList.size(); i++){
+		printf("%d ", sList[i]->getValue());
+	}
+	printf("\n");
+
+	printf("T-List: ");
+	for(int i=0; i<tList.size(); i++){
+		printf("%d ", tList[i]->getValue());
+	}
+	printf("\n");
+}
+
 /*********** ADJACENCY MATRIX FUNCTIONS ***********/
 void Tree::setupLists(Node * startNode){
 	if(startNode != nullptr){
@@ -370,13 +397,28 @@ void Tree::setupLists(Node * startNode){
 		switch(nt){
 			case NodeType::x:
 				if(startNode->getIsRight()){
-					pList.push_back(startNode);
+					for(int t=0; t<pList.size(); t++){
+						notInList = notInList && (startNode != pList[t]);
+					}
+					if(notInList){
+						pList.push_back(startNode);	
+					}
 				} else {
-					qList.push_back(startNode);
+					for(int t=0; t<qList.size(); t++){
+						notInList = notInList && (startNode != qList[t]);
+					}
+					if(notInList){
+						qList.push_back(startNode);	
+					}
 				}
 				break;
 			case NodeType::y:
-				sList.push_back(startNode);
+				for(int t=0; t<sList.size(); t++){
+					notInList = notInList && (startNode != sList[t]);
+				}
+				if(notInList){
+					sList.push_back(startNode);	
+				}
 				break;
 			case NodeType::leaf:
 				for(int t=0; t<tList.size(); t++){
@@ -561,6 +603,7 @@ void Tree::findPoint(int x, int y, Node * startNode){
 
 // Encrypted -- Serial
 void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
+	
 	if(startNode != nullptr){
 
 	    // Needed for comparisons
@@ -585,9 +628,9 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
 			helib::Ctxt tmpResult2(tmpResult);
 
-//			helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
-//			// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
-//			tmpResult.multiplyBy(ltCtxt);
+			// helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+			// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
+			// tmpResult.multiplyBy(ltCtxt);
 
 			// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
 			helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
@@ -664,7 +707,7 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
 			helib::Ctxt tmpResult2(tmpResult);
 
-//			tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
+			// tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
 			// encryptor.decryptAndPrintCondensed("pointCtxt <= yVertex", tmpResult, maxBits);
 			helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1);
 			tmpResult2.multiplyBy(gtCtxt);
@@ -865,6 +908,7 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 	Node * startNode = root;
 	helib::Ctxt zeros(*(encryptor.getPublicKey()));
 	for(int s=0; s<pathLabel.size(); s++){
+		encryptor.decryptAndPrintCondensed("resultCtxt", resultCtxt, totalTrapezoids+1);
 		if(startNode != nullptr){
 			NodeType nt = startNode->getNodeType();
 			if(nt == NodeType::x){
@@ -878,20 +922,27 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 					// printf("%ld ", xVertex[i]);
 				}
 				
+				helib::Ctxt comp = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
 				// printf("\t Checking Left\n");
 				if(pathLabel.at(s) == '0'){
 					// Move to left
-					helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+					// Needed for comparisons
+					helib::Ptxt<helib::BGV> ones(*(encryptor.getContext()));
+					for(int i=0; i<nSlots; i++){
+					    ones[i] = 1;
+					}
+					// helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+					comp.addConstant(ones);
 					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
 					// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
-					resultCtxt.multiplyBy(ltCtxt);
+					resultCtxt.multiplyBy(comp);
 					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", resultCtxt, maxBits);
 					startNode = startNode->getLeft();
 				} else if(pathLabel.at(s) == '1'){
 					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
-					helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
+					
 					// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, maxBits);
-					resultCtxt.multiplyBy(gtCtxt);
+					resultCtxt.multiplyBy(comp);
 					// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", resultCtxt, maxBits);
 					startNode = startNode->getRight();
 				}
@@ -931,15 +982,21 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 				// printf("\t");
 				// encryptor.decryptAndPrintCondensed("c1", c1, maxBits);
 
+				helib::Ctxt comp = privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1);
 				if(pathLabel.at(s) == '0'){
 					// printf("\t Checking Left\n");
-					resultCtxt.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
+					helib::Ptxt<helib::BGV> ones(*(encryptor.getContext()));
+					for(int i=0; i<nSlots; i++){
+					    ones[i] = 1;
+					}
+					comp.addConstant(ones);
+					resultCtxt.multiplyBy(comp);
 					startNode = startNode->getLeft();
 					// Move to left
 				} else if(pathLabel.at(s) == '1'){
 					// printf("\t Checking Right\n");
 					// Move to right
-					resultCtxt.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));	
+					resultCtxt.multiplyBy(comp);	
 					startNode = startNode->getRight();
 				}
 			}
@@ -948,12 +1005,20 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 	// Leaf Node
 	// Mask result based on T_ID
 	int tID = startNode->getValue();
-	printf("\tGot to Leaf %d\n", tID);
-	// encryptor.decryptAndPrintCondensed("tmpResult", tmpResult, maxBits);
+	// printf("\tGot to Leaf %d\n", tID);
+	std::string msg = "Got to Leaf " + std::to_string(tID);
+	printf("\t");
+	encryptor.decryptAndPrintCondensed(msg, resultCtxt, maxBits*2);
 	helib::Ptxt<helib::BGV> mask (*(encryptor.getContext())); 
 	mask[tID] = 1;
+	printf("\tmask:");
+	for(int i=0; i<maxBits*2; i++){
+		std::cout << mask[i] << " ";
+	}
+	printf("\n");
 	resultCtxt.multByConstant(mask);
-	
+	printf("\t");
+	encryptor.decryptAndPrintCondensed("After masking", resultCtxt, totalTrapezoids+1);
 	// resultCtxt = resultCtxt OR tmpResult = xor(r,t) + and(r,t) 
 	// Not done for one path, move to other function.
 
@@ -963,4 +1028,99 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 	// resultCtxt += tmpResult;	//xor
 	// resultCtxt += andCtxt;		//xor + and
 	// printf("\t Accumulated result\n");
+}
+
+void Tree::evaluatePath2(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
+	Node * startNode = root;
+
+	helib::Ctxt zeros(*(encryptor.getPublicKey()));
+
+    // Needed for comparisons
+    helib::Ptxt<helib::BGV> ones(*(encryptor.getContext()));
+    for(int i=0; i<maxBits; i++){
+        ones[i] = 1;
+    }
+
+	for(int s=0; s<pathLabel.size(); s++){
+		if(startNode != nullptr){
+			NodeType nt = startNode->getNodeType();
+			if(nt != NodeType::leaf){
+				// Same processes for Y or X node. 
+				helib::Ctxt comp = startNode->getNodeResult(); // Get pre-processed result -- stores greater than (>) result
+				// std::string msg = startNode->getMatrixLabel()+" (val=" + std::to_string(startNode->getValue()) + ") result";
+				if(pathLabel.at(s) == '0'){
+					// Path this thread is testing specifies move to left
+					comp.addConstant(ones); // Left refers to less than equal to (<=), so need (<=) result. LTE =  not GT --> LTE = GT + 1
+					// encryptor.decryptAndPrintCondensed(msg, resultCtxt, maxBits*2);
+					resultCtxt.multiplyBy(comp);
+					startNode = startNode->getLeft();
+				} else if(pathLabel.at(s) == '1'){
+					// Path this thread is testing specifies move to right
+					// encryptor.decryptAndPrintCondensed(msg, resultCtxt, maxBits*2);
+					resultCtxt.multiplyBy(comp);
+					startNode = startNode->getRight();
+				}
+
+			}
+		}
+	}
+
+	// Reached leaf node, filer the ctxt so it is =1 only at the tID-th slot.
+	int tID = startNode->getValue(); 
+	helib::Ptxt<helib::BGV> mask(*(encryptor.getContext()));
+	mask[tID] = 1;
+	resultCtxt.multByConstant(mask);
+	// Return with result of path in resultCtxt
+}
+// Do HE evaluation of each node based on pointCtxt
+// Assumes the lists for adjacency matrix have already been made
+helib::Ctxt Tree::evaluateAllNodes(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, int maxBits, int nSlots){
+	// Concatenate all p, q, and s nodes
+	std::vector<Node *> pqNodes = pList; // Insert p Nodes
+	pqNodes.insert(pqNodes.end(), qList.begin(), qList.end()); // Insert q Nodes
+	pqNodes.insert(pqNodes.end(), sList.begin(), sList.end()); // insert s Nodes
+
+	// for initializing pathResultCtxt
+	helib::Ptxt<helib::BGV> ones(*(encryptor.getContext()));
+	for(int i=0; i<nSlots; i++){
+	    ones[i] = 1;
+	}
+	helib::Ctxt finalResult(*(encryptor.getPublicKey()));
+
+	printf("\tEvaluating all nodes.\n");
+	auto start = std::chrono::high_resolution_clock::now();
+	#pragma omp parallel for
+	for (int i=0; i<pqNodes.size(); i++){
+		// std::cout <<"\t" << pqNodes[i]->getMatrixLabel() << std::endl;
+		pqNodes[i]->evaluateNode(encryptor, privUtil, pointCtxt, maxBits, nSlots);
+	}
+	auto stop = std::chrono::high_resolution_clock::now();            
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+	printf("\tTime to evaluate all nodes: %0.2fs\n", duration.count()/1000.0);
+
+	printf("\tAccumulating Results (total paths=%d)\n", (int)allPaths.size());
+	start = std::chrono::high_resolution_clock::now();
+	#pragma omp parallel for
+	for (int i=0; i<allPaths.size(); i++){
+	// int i=1;
+		helib::Ctxt pathResultCtxt(*(encryptor.getPublicKey()));
+
+		pathResultCtxt.addConstant(ones); // initialized to one because will be accumulating AND in evaluetePath2. Initialized to zero will force zero regardless of actual result.
+		evaluatePath2(encryptor, privUtil, pointCtxt, pathResultCtxt, maxBits, nSlots, allPaths[i]);
+
+		// finalResult <-- finalResult OR pathResult
+		#pragma omp critical
+		{
+			// printf("Path %d entered critical region.\n", i);
+			helib::Ctxt andCtxt(pathResultCtxt); //and
+			andCtxt.multiplyBy(finalResult);
+			finalResult += pathResultCtxt; //xor
+			finalResult += andCtxt;       //xor + and
+			// encryptor.decryptAndPrintCondensed("finalResult", finalResult, maxBits*2);	
+		}
+	}
+	stop = std::chrono::high_resolution_clock::now();            
+	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop-start);
+	printf("\tTiime to accumulate reulsts: %0.2fs\n", duration.count()/1000.0);
+	return finalResult;
 }

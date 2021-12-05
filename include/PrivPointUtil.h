@@ -17,6 +17,7 @@ public:
     helib::Ctxt secureGT(Encryptor &, int, int, helib::Ctxt, helib::Ctxt);
     helib::Ctxt binaryMult(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>, int);
     helib::Ctxt binaryAdd(Encryptor &, int, int, helib::Ctxt, helib::Ptxt<helib::BGV>);
+    int processResult(Encryptor &, helib::Ctxt, int, int);
 };
 
 #endif /*PRIVPOINTLOC_PRIVPOINTUTIL_H*/

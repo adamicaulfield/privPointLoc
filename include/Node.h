@@ -9,6 +9,9 @@
 #include <string>
 #include "Tree.h"
 #include <vector>
+#include <helib/helib.h>
+#include "Encryptor.h"
+#include "PrivPointUtil.h"
 
 class Tree;
 class Segment;
@@ -47,6 +50,9 @@ public:
 
     void addPathLabel(std::string);
     std::vector<std::string> getPathLabels();
+
+    void evaluateNode(Encryptor &, PrivPointUtil *, helib::Ctxt, int, int);
+    helib::Ctxt getNodeResult();
 private:
     Node * left;
     Node * right;
@@ -58,6 +64,7 @@ private:
     int matrixIndex;
     std::string matrixLabel; // for printing the adjacency matrix
     std::vector<std::string> pathLabels; // for parallel processing of privPointLoc
+    helib::Ctxt * result;
 };
 
 #endif /*PRIVPOINTLOC_NODE_H*/
