@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     unsigned long plaintext_prime_modulus = 2;
     unsigned long phiM = 21845;
     unsigned long lifting = 1;
-    unsigned long numOfBitsOfModulusChain = 512+256;
+    unsigned long numOfBitsOfModulusChain = 512+512;
     unsigned long numOfColOfKeySwitchingMatrix = 2;  
     
     Encryptor encryptor("/tmp/sk.txt", "/tmp/pk.txt", plaintext_prime_modulus, phiM, lifting, numOfBitsOfModulusChain, numOfColOfKeySwitchingMatrix);

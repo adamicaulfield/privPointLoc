@@ -87,7 +87,7 @@ void Tree::insert(Segment * s){
 		minX = xl;
 		maxX = xr;
 	} 
-	else if(xr < minX){ // Whole segment is to left of current map
+	else if(xr < minX && xl < minX){ // Whole segment is to left of current map
 		printf("\tAdding seg to tree: seg left of whole map\n");
 		Node * searchNode = root;
 		Node * prevNode;
@@ -110,7 +110,7 @@ void Tree::insert(Segment * s){
 		}
 		minX = xr;
 	}
-	else if(xl > maxX){ // whole segment is to the right of current map
+	else if(xl > maxX && xr > maxX){ // whole segment is to the right of current map
 		printf("\tAdding seg to tree: seg right of whole map\n");
 		Node * searchNode = root;
 		Node * prevNode;
