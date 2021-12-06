@@ -1,14 +1,43 @@
 # Private Point Location
 
 ## Description
-This is a project done as a part of the CSCI-716 Computational Geometry course at RIT. In this project, I investigate a topic which combines algorithms from Computational Geometry and Homomorphic Encryption (HE). 
+This is a project done as a part of the CSCI-716 Computational Geometry course at RIT. In this project, I investigate a topic which combines Planar Point Location and Homomorphic Encryption (HE). 
 
-In computational geometry, there are algorithms which make planar point location effieicnt. In application, this requires a user to share their location information to a 3rd party service who owns an application. The 3rd party will conduct the algorithm to identify their region, and will make an evaluation based on their region (such as closest resturaunt, whether their region is effected by a storm warning, etc.). 
-
-A user may be interested in preserving the privacy of their location when using apps. This scenario motivates the work here. This introduces a challenge because these algorithms typically rely on knowledge of the points coordinates and make comparisons to edges and vertices of the regions. Because of this, I aim to use HE to make the point private, and make the algorithms for point location homomorphic so that it can be executed on a point (user location) which remains private throughout.
+Through this project, I would like to explore the question: is it possible to conduct Planar Point Location in a Trapezoidal Map given the coordinates of the point are encrypted? Homomorphic Encryption (HE) is an encryption scheme which allows for arithmetic over data without requiring decryption. Because of this, I aim in this project to combine HE with Trapezoidal Maps to conduct Planar Point Location.
 
 ## Dependencies
-This is implemented in C++, and uses HELib for the HE algorithms in C++. It also uses CMake 3.15 to build the project.
+All dependencies can be installed via the bootstrap.sh script. 
+
+## Compile
+
+First, run `./bootstrap.sh`
+
+Call `cmake .` A common error comes from needing to change the path in `CMakeCache.txt` to the path of your current directory
+
+Call `make`
+
+## How to Run
+
+### Segments file
+First, the file `ac7717.txt` contains the format for which the segments are specified. The segments currently in the text file and resulting trapezoidal map are graphed at https://people.rit.edu/ac7717/csci716.html
+
+The first line is one number, specifying the total number of segments
+
+The second line is the bounds of the plane `0 0 MAX_X MAX_Y`
+
+Next, segments are specified by `vertex1_X vertex1_Y vertex2_X vertex2_Y`.
+
+### Plaintext mode
+
+Plaintext mode only runs the plaintext component: constructing the trapezoid maps, printing the DAG, and printing all paths to trapezoids.
+
+To run this mode, simply call `./bin/privPointLoc ptxt`
+
+### Private Point Location
+
+The full program encrypts a point specified by the user, and completes private point location via traversing the DAG representing the trapezoidal map.
+
+First, consider the point which should be located. Given its coordinates are `X` and `Y`, execute this command to run the program: `./bin/privPointLoc main 8 X Y`
 
 ## Contact
 Name: Adam Caulfield
