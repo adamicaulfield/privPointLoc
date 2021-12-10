@@ -611,7 +611,7 @@ void Tree::writeAdjacencyMatrix(Node * startNode){
 	}
 }
 
-void Tree::wrireSumsAdjacencyMatrix(){
+void Tree::writeSumsAdjacencyMatrix(){
 	int size = adjMatrix.size();
 	for(int i=1; i<size-1; i++){ //ith row
 		int sum = 0;
@@ -820,166 +820,8 @@ void Tree::findPrivatePoint(Encryptor &encryptor, PrivPointUtil * privUtil, heli
 	}
 }
 
-// Encrypted -- Parallel v1
-void Tree::findPrivatePoint2(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, helib::Ctxt tmpResult, Node * startNode, int maxBits, int nSlots){
-	if(startNode != nullptr){
-		NodeType nt = startNode->getNodeType();
-		if(nt == NodeType::x){
-			printf("\t Checking X-Node\n");
-			// Convert vectex X Point to bin
-			std::vector<long> xVertex = privUtil->encodePoint(maxBits, startNode->getValue(), nSlots);
-			helib::Ptxt<helib::BGV> xVertexPtxt (*(encryptor.getContext()));
-			// printf("xVertex Bits: ");
-			for(int i=0; i<2*maxBits; i++){
-				xVertexPtxt[i] = xVertex[i];
-				// printf("%ld ", xVertex[i]);
-			}
-			// printf("\n");
-
-			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
-			helib::Ctxt tmpResult2(tmpResult);
-
-			#pragma omp parallel
-			{
-				if(omp_get_thread_num()==0){
-					helib::Ctxt ltCtxt = privUtil->secureLT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
-					// encryptor.decryptAndPrintCondensed("ltCtxt", ltCtxt, maxBits);
-					tmpResult.multiplyBy(ltCtxt);
-					// encryptor.decryptAndPrintCondensed("pointCtxt <= xVertex", tmpResult, maxBits);
-				}
-				if(omp_get_thread_num()==1){
-					helib::Ctxt gtCtxt = privUtil->secureGT(encryptor, maxBits, nSlots, pointCtxt, xVertexPtxt);
-					// encryptor.decryptAndPrintCondensed("gtCtxt", gtCtxt, maxBits);
-					tmpResult2.multiplyBy(gtCtxt);
-					// encryptor.decryptAndPrintCondensed("pointCtxt > xVertex", tmpResult2, maxBits);
-				}
-			}
-
-			// Move to left
-			// printf("\t Checking Left\n");
-			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
-
-			// Move to right
-			// printf("\t Checking Right\n");
-			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
-
-		} else if(nt == NodeType::y){
-			printf("\t Checking Y-Node\n");
-			// Convert dy, dx, and dx*intercept to bin
-			int dx = startNode->getSegment()->getDx();
-			int dy = startNode->getSegment()->getDy();
-			int dxb =  dx * startNode->getSegment()->getIntercept();
-
-			std::vector<long> dxBits = privUtil->encodePoint(maxBits, dx, nSlots);
-			std::vector<long> dyBits = privUtil->encodePoint(maxBits, dy, nSlots);
-			std::vector<long> dxbBits = privUtil->encodePoint(maxBits, dxb, nSlots);
-
-			helib::Ptxt<helib::BGV> dxPtxt (*(encryptor.getContext())); 
-			helib::Ptxt<helib::BGV> dyPtxt (*(encryptor.getContext())); 
-			helib::Ptxt<helib::BGV> dxbPtxt (*(encryptor.getContext())); 
-			for(int i=0; i<maxBits; i++){
-			    dxPtxt[i] = dxBits[i];
-			    dyPtxt[i] = dyBits[i];
-			    dxbPtxt[i] = dxbBits[i];
-			}			
-
-			// printf("dxPtxt (%d): ", dx);
-			// for(int i=0; i<maxBits; i++){
-			//     printf("%ld ", dxBits[i]);
-			// }
-			// printf("\n");	
-
-			// printf("dyPtxt: (%d)", dy);
-			// for(int i=0; i<maxBits; i++){
-			//     printf("%ld ", dyBits[i]);
-			// }
-			// printf("\n");	
-
-			// printf("dxbPtxt: (%d)", dxb);
-			// for(int i=0; i<maxBits; i++){
-			//     printf("%ld ", dxbBits[i]);
-			// }
-			// printf("\n");	
-
-			helib::Ctxt dyx(*(encryptor.getPublicKey()));
-			helib::Ctxt dxy(*(encryptor.getPublicKey()));
-
-			#pragma omp parallel
-			{
-				if(omp_get_thread_num()==0){
-					dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
-				}
-
-				if(omp_get_thread_num()==1){
-					dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
-				}
-			}
-
-			// Compute dy*[x]+dxb
-			// helib::Ctxt dyx = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dyPtxt, 0);
-			// printf("\t");
-			// encryptor.decryptAndPrintCondensed("dyx", dyx, maxBits);
-
-			// Compute dx*[y]
-			// helib::Ctxt dxy = privUtil->binaryMult(encryptor, maxBits, nSlots, pointCtxt, dxPtxt, 1);
-			// printf("\t");
-			// encryptor.decryptAndPrintCondensed("dxy", dxy, maxBits);
-
-			// Move to left if dx[y] <= (c1=dy[x]+dxb)
-			helib::Ctxt c1 = privUtil->binaryAdd(encryptor, maxBits, nSlots, dyx, dxbPtxt);
-			// printf("\t");
-			// encryptor.decryptAndPrintCondensed("c1", c1, maxBits);
-
-			// Do secure Comparison --> tmpGT = secureGT(..), tmpLT = secureLT(..)
-			helib::Ctxt tmpResult2(tmpResult);
-
-			#pragma omp parallel
-			{
-				if(omp_get_thread_num()==0){
-					tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
-				}
-
-				if(omp_get_thread_num()==1){
-					tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));
-				}
-			}
-
-			// tmpResult.multiplyBy(privUtil->secureLT(encryptor, maxBits, nSlots, dxy, c1));
-			// encryptor.decryptAndPrintCondensed("pointCtxt <= yVertex", tmpResult, maxBits);
-			// tmpResult2.multiplyBy(privUtil->secureGT(encryptor, maxBits, nSlots, dxy, c1));
-			// encryptor.decryptAndPrintCondensed("pointCtxt > yVertex", tmpResult, maxBits);
-
-			// printf("\t Checking Left\n");
-			// Move to left
-			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult, startNode->getLeft(), maxBits, nSlots);
-
-			// printf("\t Checking Right\n");
-			// Move to right
-			findPrivatePoint(encryptor, privUtil, pointCtxt, resultCtxt, tmpResult2, startNode->getRight(), maxBits, nSlots);
-
-		} else{ // Leaf Node
-			// Mask result based on T_ID
-			int tID = startNode->getValue();
-			// printf("\tGot to TID=%d\n", tID);
-			// encryptor.decryptAndPrintCondensed("tmpResult", tmpResult, maxBits);
-			helib::Ptxt<helib::BGV> mask (*(encryptor.getContext())); 
-			mask[tID] = 1;
-			tmpResult.multByConstant(mask);
-			
-			// resultCtxt = resultCtxt OR tmpResult = xor(r,t) + and(r,t)
-			helib::Ctxt andCtxt(tmpResult); //and
-			andCtxt.multiplyBy(resultCtxt);
-
-			resultCtxt += tmpResult;	//xor
-			resultCtxt += andCtxt;		//xor + and
-			// printf("\t Accumulated result\n");
-
-		}
-	} 
-}
-
 // Evaluate one path (for debugging)
-void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
+void Tree::evaluateOnePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
 	Node * startNode = root;
 	helib::Ctxt zeros(*(encryptor.getPublicKey()));
 	printf("\t\t");
@@ -1114,7 +956,7 @@ void Tree::evaluatePath(Encryptor &encryptor, PrivPointUtil * privUtil, helib::C
 	// printf("\t Accumulated result\n");
 }
 
-void Tree::evaluatePath2(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
+void Tree::getPathResult(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, helib::Ctxt &resultCtxt, int maxBits, int nSlots, std::string pathLabel){
 	Node * startNode = root;
 
 	helib::Ctxt zeros(*(encryptor.getPublicKey()));
@@ -1156,6 +998,7 @@ void Tree::evaluatePath2(Encryptor &encryptor, PrivPointUtil * privUtil, helib::
 	resultCtxt.multByConstant(mask);
 	// Return with result of path in resultCtxt
 }
+
 // Do HE evaluation of each node based on pointCtxt
 // Assumes the lists for adjacency matrix have already been made
 helib::Ctxt Tree::evaluateAllNodes(Encryptor &encryptor, PrivPointUtil * privUtil, helib::Ctxt pointCtxt, int maxBits, int nSlots){
@@ -1190,7 +1033,7 @@ helib::Ctxt Tree::evaluateAllNodes(Encryptor &encryptor, PrivPointUtil * privUti
 		helib::Ctxt pathResultCtxt(*(encryptor.getPublicKey()));
 
 		pathResultCtxt.addConstant(ones); // initialized to one because will be accumulating AND in evaluetePath2. Initialized to zero will force zero regardless of actual result.
-		evaluatePath2(encryptor, privUtil, pointCtxt, pathResultCtxt, maxBits, nSlots, allPaths[i]);
+		getPathResult(encryptor, privUtil, pointCtxt, pathResultCtxt, maxBits, nSlots, allPaths[i]);
 
 		// finalResult <-- finalResult OR pathResult
 		#pragma omp critical

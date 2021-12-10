@@ -8,3 +8,4 @@ Makefile
 /data/.csv
 src/CMakeFiles/
 /.idea/
+/docs/

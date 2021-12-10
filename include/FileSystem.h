@@ -1,7 +1,8 @@
-//
-// Copyright SpiRITlab - Computations on Encrypted Data
-// Publicly available at: https://gitlab.com/SpiRITlab/coed
-//
+/**
+* Authored by Peizhao Hu.
+* Copyright SpiRITlab - Computations on Encrypted Data
+* Publicly available at: https://gitlab.com/SpiRITlab/coed
+*/
 
 #ifndef PRIVPOINTLOC_FILESYSTEM_H
 #define PRIVPOINTLOC_FILESYSTEM_H

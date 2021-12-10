@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     tree->setupLists(tree->getRoot());
     tree->initAdjacencyMatrix();
     tree->writeAdjacencyMatrix(tree->getRoot());
-    tree->wrireSumsAdjacencyMatrix();
+    tree->writeSumsAdjacencyMatrix();
 
     printf("----- Path Labels -----\n");
     tree->setupPathLabels(tree->getRoot(), "");
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
         helib::Ctxt tmpResult(*(encryptor.getPublicKey()));
         encryptor.getEncryptedArray()->encrypt(tmpResult, *(encryptor.getPublicKey()), ones);
         
-        tree->evaluatePath(encryptor, privUtil, pointCtxt, tmpResult, maxBits, nSlots, pathLabel);
+        tree->evaluateOnePath(encryptor, privUtil, pointCtxt, tmpResult, maxBits, nSlots, pathLabel);
 
         //result <-- result OR tmpResult <-- XOR(R,T)+AND(R,T)
         helib::Ctxt andCtxt(tmpResult); //and

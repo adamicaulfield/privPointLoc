@@ -29,7 +29,6 @@ set(TEST_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/tmp)
 set(SOURCES_DIR ${PROJECT_SOURCE_DIR}/src)
 set(SOURCE_FILES
         ${SOURCES_DIR}/Encryptor.cpp
-        ${SOURCES_DIR}/helibExamples.cpp
         ${SOURCES_DIR}/FileSystem.cpp
         ${SOURCES_DIR}/Tree.cpp
         ${SOURCES_DIR}/Segment.cpp

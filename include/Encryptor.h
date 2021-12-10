@@ -1,7 +1,8 @@
-//
-// Copyright SpiRITlab - Computations on Encrypted Data
-// Publicly available at: https://gitlab.com/SpiRITlab/coed
-//
+/**
+* Authored by Peizhao Hu.
+* Copyright SpiRITlab - Computations on Encrypted Data
+* Publicly available at: https://gitlab.com/SpiRITlab/coed
+*/
 
 #ifndef PRIVPOINTLOC_ENCRYPTOR_H
 #define PRIVPOINTLOC_ENCRYPTOR_H
@@ -22,6 +23,10 @@ public:
 
     void decryptAndPrint(const std::string &, const helib::Ctxt &);
 
+    /**
+    * Authored by Adam Caulfield. Thi is a
+    * modified version of decryptAndPrint(), which decrypts and prints a ciphertext. This version prints slots up to an integer length
+    */
     void decryptAndPrintCondensed(const std::string &, const helib::Ctxt &, int);
 
     helib::Context *getContext() const;
