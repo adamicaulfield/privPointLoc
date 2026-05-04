@@ -19,7 +19,7 @@ Call `make`
 ## How to Run
 
 ### Segments file
-First, the file `ac7717.txt` contains the format for which the segments are specified. The segments currently in the text file and resulting trapezoidal map are graphed at https://people.rit.edu/ac7717/csci716.html
+First, the file `ac7717.txt` contains the format for which the segments are specified. The segments currently in the text file and resulting trapezoidal map are graphed at https://adamicaulfield.github.io/csci716/
 
 The first line is one number, specifying the total number of segments
 
